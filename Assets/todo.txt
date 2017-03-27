@@ -1,0 +1,2 @@
+color correctly
+change instrument on note section

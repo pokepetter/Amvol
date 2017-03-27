@@ -1,0 +1,8 @@
+111111111111,normal
+211111111111,skip one
+2212221,Heptatonic
+222222,Whole tone
+221223,hexadiatonic 
+32232,Minor pentatonic
+22323,Major pentatonic
+23223,Ritsusen

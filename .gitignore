@@ -1,0 +1,46 @@
+# =============== #
+# Unity generated #
+# =============== #
+[Tt]emp/
+[Oo]bj/
+[Bb]uild
+[Ll]ibrary/
+sysinfo.txt
+ 
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+[Ee]xported[Oo]bj/
+/*.userprefs
+/*.csproj
+/*.pidb
+/*.suo
+/*.sln*
+/*.user
+/*.unityproj
+/*.booproj
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store*
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+[Tt]humbs.db
+
+Builds
+Midi/
+AudioClips/
+Instruments/*
+!Instruments/0DefaultPiano_n0_f500.wav
+!Instruments/0DefaultPiano_n12.wav
+!Instruments/0DefaultPiano_n24.wav
+!Instruments/0DefaultPiano_n36.wav
+!Instruments/0DefaultPiano_n48.wav
+!Instruments/0DefaultPiano_n60.wav
+!Instruments/0DefaultPiano_n72.wav
+!Instruments/0DefaultPiano_n84.wav
+
