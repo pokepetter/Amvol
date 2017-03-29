@@ -170,8 +170,12 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             playing = true
             originalPosition = x
             for noteSection in noteSections:
-                if noteSection.transform.localPosition.x >= originalPosition: //play from indicator
-                    noteSection.Play((noteSection.transform.localPosition.x - originalPosition)*8)
+                if noteSection.transform.localPosition.x * 8 >= x: //play from indicator
+                    noteSection.Play((noteSection.transform.localPosition.x - x)*8)
+                //also play note section crossing the start point
+                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) >= x:
+                    distanceToStartPoint = x - noteSection.transform.localPosition.x * 8
+                    noteSection.Play(-distanceToStartPoint)
             metronomeNoteSection.Play()
         else:
             for noteSection in noteSections:

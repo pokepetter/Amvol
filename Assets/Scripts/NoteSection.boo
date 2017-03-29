@@ -148,9 +148,15 @@ public class NoteSection (MonoBehaviour):
         Play(0)
 
     def Play(delay as int):
-        delayLeft = delay
+        print(instrument.gameObject.name + ", skip forward to: " + delay)
+        if delay < 0:
+            loopsLeft = loops - Mathf.FloorToInt(-delay/ sectionLength)
+            print(loopsLeft)
+            x = -delay - ((loopsLeft-1) * sectionLength)
+        else:
+            loopsLeft = loops
+            x = 0
         currentPositionOnTimeline = x
-        loopsLeft = loops
         playing = true
 
     def Stop():
