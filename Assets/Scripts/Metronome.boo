@@ -22,7 +22,7 @@ class Metronome (MonoBehaviour):
         noteSection.transform.localScale = Vector2.zero
         noteSection.instrument = instrument
         noteSection.loops = 100
-        instrument.audioClips[16] = audioSource.clip
+        instrument.audioClips[0] = audioSource.clip
         # noteSection.ZoomOut() //this is a hack, it zooms in for som reason.
         x = 0
         while x < 128:

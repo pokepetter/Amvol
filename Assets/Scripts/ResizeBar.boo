@@ -7,30 +7,31 @@ class ResizeBar (MonoBehaviour):
     public mouseX as int
     public deltaMouseX as single
 
-    private originalWidth as single
+    public rectTransform as RectTransform
+    public noteSection as NoteSection
+    public noteSectionRectTransform as RectTransform
 
-    private rectTransform as RectTransform
-    private noteSection as NoteSection
+    private originalPosition as single
 
-    def Awake():
-        rectTransform = transform.GetComponent(RectTransform)
-        originalWidth = rectTransform.sizeDelta.x
-        noteSection = transform.parent.GetComponent(NoteSection)
+    def Start():
+        rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
+        originalPosition = rectTransform.anchoredPosition.x
 
     public def BeginDrag():
         print("begin drag")
         startMouseX = mouseX
 
     public def EndDrag():
-        print("end drag")
+        print("end drag: " + deltaMouseX)
         startMouseX = 0
         noteSection.AddLength(deltaMouseX)
-        rectTransform.sizeDelta.x = originalWidth
+        # if rectTransform.sizeDelta.x > noteSection.sectionLength / 8:
+        rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
+        originalPosition = rectTransform.anchoredPosition.x
 
     public def Update():
         mouseX = Input.mousePosition.x / Screen.width * 100
 
         if startMouseX > 0:
             deltaMouseX = Mathf.FloorToInt((mouseX - startMouseX) /4) *4
-            rectTransform.sizeDelta.x = deltaMouseX
-
+            rectTransform.anchoredPosition.x = originalPosition + deltaMouseX

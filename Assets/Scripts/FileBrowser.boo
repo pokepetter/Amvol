@@ -107,7 +107,7 @@ public class FileBrowser (MonoBehaviour):
             startNotes as List of int
             startNotes.Add(60)
 
-            Amvol.GetInstrumentChanger().ReplaceInstrument(audioClips, startNotes, 0.05f, 0.5f, false, Color.grey)
+            Amvol.GetInstrumentChanger().ReplaceInstrument(audioClips, startNotes, 0.05f, 0.5f, false, false, Color.grey)
         if currentDirectory.Substring(currentDirectory.Length-4) == ".png":
             Amvol.GetSaveSystem().Load(currentDirectory)
         if currentDirectory.Substring(currentDirectory.Length-4) == ".mid":

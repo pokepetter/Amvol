@@ -170,12 +170,16 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             playing = true
             originalPosition = x
             for noteSection in noteSections:
-                if noteSection.transform.localPosition.x * 8 >= x: //play from indicator
-                    noteSection.Play((noteSection.transform.localPosition.x - x)*8)
+                if noteSection.transform.localPosition.x * 8 >= originalPosition: //play from indicator
+                    noteSection.Play((noteSection.transform.localPosition.x * 8)-originalPosition)
+                    print("play from indicator")
                 //also play note section crossing the start point
-                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) >= x:
-                    distanceToStartPoint = x - noteSection.transform.localPosition.x * 8
+                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) >= originalPosition:
+                    print("note section crossing")
+                    distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 8
                     noteSection.Play(-distanceToStartPoint)
+                else:
+                    print("don't play, start point is after end of note section")
             metronomeNoteSection.Play()
         else:
             for noteSection in noteSections:
@@ -222,7 +226,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         i as int = 0
 
         if RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent(RectTransform), ped.position, ped.pressEventCamera, localCursorPosition) and Input.GetKey(KeyCode.LeftAlt) == false:
-            localCursorPosition = Vector2(Mathf.Round(localCursorPosition.x /4) *4, Mathf.FloorToInt(localCursorPosition.y /4) *4)
+            localCursorPosition = Vector2(Mathf.Round(localCursorPosition.x /1) *1, Mathf.FloorToInt(localCursorPosition.y /4) *4)
 
         cursor.localPosition = localCursorPosition
         x = localCursorPosition.x * 8 / canvasButton.transform.localScale.x

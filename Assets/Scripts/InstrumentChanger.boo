@@ -64,13 +64,14 @@ class InstrumentChanger (MonoBehaviour):
 
         currentInstrument = instrument
 
-    def ReplaceInstrument(audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, color as Color):
-        ReplaceInstrument(currentInstrument, audioClips, startNotes, attack, falloff, loop, color)
+    def ReplaceInstrument(audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, isDrumSet as bool, color as Color):
+        ReplaceInstrument(currentInstrument, audioClips, startNotes, attack, falloff, loop, isDrumSet, color)
 
-    def ReplaceInstrument(targetInstrument as Instrument, audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, color as Color):
+    def ReplaceInstrument(targetInstrument as Instrument, audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, isDrumSet as bool, color as Color):
         targetInstrument.transform.GetComponent(AudioSource).clip = audioClips[0]
         targetInstrument.transform.GetComponent(AudioSource).loop = loop
         targetInstrument.SetLerpSpeed(attack, falloff)
+        targetInstrument.isDrumSet = isDrumSet
         targetInstrument.instrumentColor = color
         i as int = 0
         # print(audioClips.Count + " / " + startNotes.Count)
@@ -78,7 +79,8 @@ class InstrumentChanger (MonoBehaviour):
 
 
     public def PlayNote(y as int, z as single):
-        y = scaleChanger.NoteOffset(y, false)
+        if not currentInstrument.isDrumSet:
+            y = scaleChanger.NoteOffset(y, false)
         currentInstrument.PlayNote(y, z)
 
     public def PlayInstrument(x as int, y as int, z as single):
@@ -100,7 +102,8 @@ class InstrumentChanger (MonoBehaviour):
         
 
     public def StopPlayingNote(y as int):
-        y = scaleChanger.NoteOffset(y, false)
+        if not currentInstrument.isDrumSet:
+            y = scaleChanger.NoteOffset(y, false)
         currentInstrument.StopPlayingNote(y)
 
     public def ClearAllInstruments():

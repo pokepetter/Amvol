@@ -6,8 +6,10 @@ class Instrument (MonoBehaviour):
 
     public volume as single = 1
     public legatoSpeed as single = 50
+    public pan as single
     public attack as single = 0
     public falloff as single = 6
+    public isDrumSet as bool
     public instrumentColor as Color
 
     public audioClips as (AudioClip)
@@ -139,6 +141,8 @@ class Instrument (MonoBehaviour):
         for l in audioLerpers:
             l.SetMultiplier(dynamicVolume)
             
+    def SetPan(newPan as single):
+        pan = newPan
 
     def SetAttack(newAttack as single):
         attack = newAttack

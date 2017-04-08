@@ -40,6 +40,7 @@ public class NoteSection (MonoBehaviour):
     public instrumentChanger as InstrumentChanger
     public instrument as Instrument
     public musicScore as MusicScore
+    public noteSectionRectTransform as RectTransform
     
     public sectionLength as int = 64
     public loops as single = 1f
@@ -101,12 +102,12 @@ public class NoteSection (MonoBehaviour):
         mouse.y = Input.mousePosition.y / Screen.height * 100 /16 *9
 
         if startMouse != Vector2.zero and canMoveStuff:
-            deltaMouse.x = Mathf.RoundToInt((mouse.x - startMouse.x) /4) *4
-            deltaMouse.y = Mathf.RoundToInt((mouse.y - startMouse.y) /4) *4
+            deltaMouse.x = Mathf.RoundToInt((mouse.x - startMouse.x) /1) *1
+            deltaMouse.y = Mathf.RoundToInt((mouse.y - startMouse.y) /1) *1
             transform.localPosition = Vector2.Lerp(transform.localPosition,
                                             Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), 
                                                     Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44)),
-                                            Time.fixedDeltaTime * 15f)
+                                            Time.fixedDeltaTime * 30f)
 
 
         if playing:
@@ -148,10 +149,12 @@ public class NoteSection (MonoBehaviour):
         Play(0)
 
     def Play(delay as int):
-        print(instrument.gameObject.name + ", skip forward to: " + delay)
-        if delay < 0:
+        if delay >= 0:
+            delayLeft = delay
+            print(instrument.gameObject.name + ", delay: " + delay)
+        elif delay < 0:
             loopsLeft = loops - Mathf.FloorToInt(-delay/ sectionLength)
-            print(loopsLeft)
+            # print(loopsLeft)
             x = -delay - ((loopsLeft-1) * sectionLength)
         else:
             loopsLeft = loops
@@ -220,34 +223,61 @@ public class NoteSection (MonoBehaviour):
     public def SetLength(length as int): 
         notes = matrix(single, length, maxNotes)
         sectionLength = length
-        transform.GetComponent(RectTransform).sizeDelta.x = length /8f
-        canvas.sizeDelta.x = length
-        canvasButton.sizeDelta = Vector2(length, maxNotes)
-        timeline.sizeDelta.x = length
+        noteSectionRectTransform.sizeDelta.x = length /8f
+        # canvas.sizeDelta.x = length
+        # canvasButton.sizeDelta = Vector2(length, maxNotes)
+        # timeline.sizeDelta.x = length
 
-        pianoRoll.sizeDelta = Vector2(length, maxNotes)
+        # pianoRoll.sizeDelta = Vector2(length, maxNotes)
 
-        canvasBgMat.mainTextureScale = Vector2(length, maxNotes)
+        # canvasBgMat.mainTextureScale = Vector2(length, maxNotes)
+
+    public def CalculateLoops():
+        loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
+
 
     public def AddLength(length as int):
-        if length != 0:
+        length *= 8
+
+        if length > 0:
             sectionLength = notes.GetLength(0) + length
             newNotes = matrix(single, sectionLength, maxNotes)
 
-            for x in range(newNotes.GetLength(0)):
-                for y in range(newNotes.GetLength(1)):
+            for x in range(notes.GetLength(0)):
+                for y in range(notes.GetLength(1)):
                     newNotes[x,y] = notes[x,y]
 
             notes = newNotes
 
             guiLength = sectionLength /8
-            transform.GetComponent(RectTransform).sizeDelta.x = guiLength
-            canvas.sizeDelta.x = guiLength
-            canvasButton.sizeDelta.x = guiLength
-            timeline.sizeDelta.x = guiLength
-            pianoRoll.sizeDelta.x = guiLength
-            canvasBgMat.mainTextureScale.x = guiLength
-            print("Added to length: " + length + ". New length is: " + notes.GetLength(0))
+            if noteSectionRectTransform.sizeDelta.x < guiLength:
+                noteSectionRectTransform.sizeDelta.x = guiLength
+        else:
+            //find actual width
+            x = notes.GetLength(0)-1
+            while x > 0:
+                for y in range(maxNotes):
+                    if notes[x,y] > 0:
+                        maxX = x
+                        x = 0
+                        break
+                x--
+            if maxX < notes.GetLength(0) + length:
+                print("clip note section")
+                sectionLength = notes.GetLength(0) + length
+                newNotes = matrix(single, sectionLength, maxNotes)
+
+                for x in range(sectionLength):
+                    for y in range(notes.GetLength(1)):
+                        newNotes[x,y] = notes[x,y]
+
+                notes = newNotes
+            else:
+                print("show warning")
+
+
+        CalculateLoops()
+        print("Added to length: " + length + ". New length is: " + notes.GetLength(0))
 
 
     public def SetBPM(newBPM as int):
