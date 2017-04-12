@@ -1,5 +1,3 @@
 proper drum instrument
 arpeggio patterns
-drag for resize
-drag for loop
 double click to zoom in and edit

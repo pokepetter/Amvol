@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: replaced 'PositionFog()' with multiply of UNITY_MATRIX_MVP by position
 // Upgrade NOTE: replaced 'V2F_POS_FOG' with 'float4 pos : SV_POSITION'
 // Upgrade NOTE: replaced 'glstate.matrix.modelview[0]' with 'UNITY_MATRIX_MV'
@@ -48,7 +50,7 @@
              
              v2f vert (appdata_vert v) {
                  v2f o;
-                 o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+                 o.pos = UnityObjectToClipPos (v.vertex);
                  o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
                  float4 viewPos = mul(UNITY_MATRIX_MV, v.vertex);
                  float alpha = (-viewPos.z - _ProjectionParams.y)/_FadeDistance;

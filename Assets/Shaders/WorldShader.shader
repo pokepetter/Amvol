@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Custom/WorldShader" {
     Properties {
@@ -34,7 +36,7 @@ Shader "Custom/WorldShader" {
                 v2f vert (appdata_base v)
                 {
                         v2f o;
-                        o.position = mul (UNITY_MATRIX_MVP, v.vertex); //Transform the vertex position
+                        o.position = UnityObjectToClipPos (v.vertex); //Transform the vertex position
                         o.suv = o.position; //pass position for screen coords
                         o.uv = TRANSFORM_TEX (v.texcoord, _MainTex); //Prepare the vertex uv
                         o.pos = mul (unity_ObjectToWorld, v.vertex); //world position for height check

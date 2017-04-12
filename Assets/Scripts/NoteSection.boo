@@ -44,7 +44,7 @@ public class NoteSection (MonoBehaviour):
     
     public sectionLength as int = 64
     public loops as single = 1f
-    private loopsLeft as single
+    public loopsLeft as single
     private maxNotes as int = 128
     private tempoMarkers as (int)
 
@@ -135,14 +135,20 @@ public class NoteSection (MonoBehaviour):
                         y++
                     x++
 
-                    if x >= sectionLength:
-                        x = 0
-                        y = 0
-                        loopsLeft -= 1f
-                        if loopsLeft <= 0f:
+                    if loopsLeft >= 1f:
+                        if x >= sectionLength:
+                            x = 0
+                            y = 0
+                            loopsLeft -= 1f
+                            if loopsLeft <= 0f:
+                                playing = false
+                    else:
+                        if x >= sectionLength * loopsLeft:
                             playing = false
+                    
 
-                indicator.localPosition.x = x
+
+                indicator.localPosition.x = ((loops - loopsLeft) * sectionLength) + x
 
 
     def Play():
@@ -151,11 +157,14 @@ public class NoteSection (MonoBehaviour):
     def Play(delay as int):
         if delay >= 0:
             delayLeft = delay
+            loopsLeft = loops
+            x = 0
             print(instrument.gameObject.name + ", delay: " + delay)
         elif delay < 0:
             loopsLeft = loops - Mathf.FloorToInt(-delay/ sectionLength)
             # print(loopsLeft)
-            x = -delay - ((loopsLeft-1) * sectionLength)
+            x = -delay - ((loops-loopsLeft) * sectionLength)
+            # x = -delay / (loops-loopsLeft)
         else:
             loopsLeft = loops
             x = 0

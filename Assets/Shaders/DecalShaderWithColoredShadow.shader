@@ -1,4 +1,6 @@
-﻿Shader "Chroma2/DecalShaderWithColoredShadow" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Chroma2/DecalShaderWithColoredShadow" {
     Properties {
          _MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
     }
@@ -32,7 +34,7 @@
             {
                 v2f o;
                 
-                o.pos = mul( UNITY_MATRIX_MVP, v.vertex);
+                o.pos = UnityObjectToClipPos( v.vertex);
                 o.uv = v.texcoord.xy;
                 TRANSFER_VERTEX_TO_FRAGMENT(o);
                 return o;
@@ -77,7 +79,7 @@
              {
                  v2f o;
 
-                 o.pos = mul( UNITY_MATRIX_MVP, v.vertex);
+                 o.pos = UnityObjectToClipPos( v.vertex);
                  o.uv = v.texcoord.xy;
                  TRANSFER_VERTEX_TO_FRAGMENT(o);
                  return o;

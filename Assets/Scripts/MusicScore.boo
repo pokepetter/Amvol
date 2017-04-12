@@ -174,9 +174,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                     noteSection.Play((noteSection.transform.localPosition.x * 8)-originalPosition)
                     print("play from indicator")
                 //also play note section crossing the start point
-                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) >= originalPosition:
-                    print("note section crossing")
+                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) > originalPosition:
+                    
                     distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 8
+                    print("note section crossing " + (-distanceToStartPoint))
                     noteSection.Play(-distanceToStartPoint)
                 else:
                     print("don't play, start point is after end of note section")

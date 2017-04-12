@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Chroma2/AltitudeFog"
 {
@@ -38,7 +40,7 @@ Shader "Chroma2/AltitudeFog"
  
         void vert (inout appdata_full v, out Input o) 
         {
-            float4 hpos = mul (UNITY_MATRIX_MVP, v.vertex);
+            float4 hpos = UnityObjectToClipPos (v.vertex);
             o.pos = mul(unity_ObjectToWorld, v.vertex);
             o.uv_MainTex = v.texcoord.xy;
         }
