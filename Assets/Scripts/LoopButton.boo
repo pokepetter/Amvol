@@ -1,7 +1,7 @@
 ﻿import UnityEngine
 import System.Collections
 
-class LoopBar (MonoBehaviour): 
+class LoopButton (MonoBehaviour): 
 
     public rectTransform as RectTransform
     public noteSection as NoteSection

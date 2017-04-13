@@ -1,7 +1,7 @@
 ﻿import UnityEngine
 import System.Collections
 
-class ResizeBar (MonoBehaviour): 
+class ResizeButton (MonoBehaviour): 
 
     public startMouseX as single
     public mouseX as int

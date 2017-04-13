@@ -45,6 +45,8 @@ public class NoteSection (MonoBehaviour):
     public sectionLength as int = 64
     public loops as single = 1f
     public loopsLeft as single
+    public resizeButton as RectTransform
+    public loopButton as RectTransform
     private maxNotes as int = 128
     private tempoMarkers as (int)
 
@@ -159,7 +161,6 @@ public class NoteSection (MonoBehaviour):
             delayLeft = delay
             loopsLeft = loops
             x = 0
-            print(instrument.gameObject.name + ", delay: " + delay)
         elif delay < 0:
             loopsLeft = loops - Mathf.FloorToInt(-delay/ sectionLength)
             # print(loopsLeft)
@@ -262,7 +263,7 @@ public class NoteSection (MonoBehaviour):
             if noteSectionRectTransform.sizeDelta.x < guiLength:
                 noteSectionRectTransform.sizeDelta.x = guiLength
         else:
-            //find actual width
+            //find actual width without empty space
             x = notes.GetLength(0)-1
             while x > 0:
                 for y in range(maxNotes):
@@ -271,22 +272,33 @@ public class NoteSection (MonoBehaviour):
                         x = 0
                         break
                 x--
+
             if maxX < notes.GetLength(0) + length:
-                print("clip note section")
-                sectionLength = notes.GetLength(0) + length
-                newNotes = matrix(single, sectionLength, maxNotes)
-
-                for x in range(sectionLength):
-                    for y in range(notes.GetLength(1)):
-                        newNotes[x,y] = notes[x,y]
-
-                notes = newNotes
+                TruncateEnd(length)
             else:
-                print("show warning")
+                //TODO: show warning
+                TruncateEnd(length)
 
 
         CalculateLoops()
         print("Added to length: " + length + ". New length is: " + notes.GetLength(0))
+
+    def TruncateEnd(length as int):
+        print("cut note section")
+        sectionLength = notes.GetLength(0) + length
+        newNotes = matrix(single, sectionLength, maxNotes)
+
+        for x in range(sectionLength):
+            for y in range(notes.GetLength(1)):
+                newNotes[x,y] = notes[x,y]
+
+        notes = newNotes
+
+        noteSectionRectTransform.sizeDelta.x = sectionLength /8
+
+        for noteBox in canvasButton.GetComponentsInChildren[of RectTransform]():
+            if noteBox.anchoredPosition.x > sectionLength and noteBox != indicator:
+                Destroy(noteBox.gameObject)
 
 
     public def SetBPM(newBPM as int):

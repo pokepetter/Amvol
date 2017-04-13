@@ -141,7 +141,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                     openPosition.y += 4f
 
             currentNoteSection = CreateNoteSection(openPosition, 0)
-            currentNoteSection.SetLength(projectLength*32)
+            currentNoteSection.SetLength(projectLength*8)
             currentNoteSection.playing = true
             currentNoteSection.isRecording = true
             newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
@@ -161,7 +161,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             else:
                 //trim empty space at the end, not used in the recording
                 recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
-                currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength))
+                currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8)
+                currentNoteSection.resizeButton.anchoredPosition.x = currentNoteSection.sectionLength / 8
 
 
 
@@ -172,15 +173,14 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             for noteSection in noteSections:
                 if noteSection.transform.localPosition.x * 8 >= originalPosition: //play from indicator
                     noteSection.Play((noteSection.transform.localPosition.x * 8)-originalPosition)
-                    print("play from indicator")
+                    # print("play from indicator")
                 //also play note section crossing the start point
                 elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) > originalPosition:
                     
                     distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 8
-                    print("note section crossing " + (-distanceToStartPoint))
+                    # print("note section crossing " + (-distanceToStartPoint))
                     noteSection.Play(-distanceToStartPoint)
-                else:
-                    print("don't play, start point is after end of note section")
+                    
             metronomeNoteSection.Play()
         else:
             for noteSection in noteSections:
@@ -247,7 +247,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         return metronomeNoteSection
 
     public def CreateNoteSection(position as Vector2, startLength as int) as NoteSection:
-        print("create note section, length :" + startLength)
+        # print("create note section, length :" + startLength)
         noteSectionObject = Instantiate(noteSectionPrefab)
         noteSectionObject.transform.SetParent(canvasButton, false)
         noteSectionObject.transform.localPosition = position
