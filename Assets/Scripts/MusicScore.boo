@@ -267,3 +267,17 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if currentNoteSection != null:
             noteSections.Remove(currentNoteSection)
             Destroy(currentNoteSection.gameObject)
+
+    def FindAvailableSpace(x as int, y as int, width as int) as Vector2:
+
+        for nS in noteSections:
+            //limit y
+            currentRect = nS.GetComponent(RectTransform)
+            if currentRect.anchoredPosition.y == y:
+                print("same line")
+                if x >= currentRect.anchoredPosition.x and x < currentRect.anchoredPosition.x + currentRect.sizeDelta.x:
+                    print("space conflict")
+                    x = currentRect.anchoredPosition.x + currentRect.sizeDelta.x
+
+        availablePosition = Vector2(x,y)
+        return availablePosition 

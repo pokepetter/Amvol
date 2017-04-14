@@ -100,12 +100,13 @@ public class NoteSection (MonoBehaviour):
         # if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.S):
         #     Amvol.GetSaveSystem().Save(notes, "Untitled")
 
-        mouse.x = Input.mousePosition.x / Screen.width * 100 
-        mouse.y = Input.mousePosition.y / Screen.height * 100 /16 *9
 
         if startMouse != Vector2.zero and canMoveStuff:
+            mouse.x = Input.mousePosition.x / Screen.width * 100
+            mouse.y = Input.mousePosition.y / Screen.height * 100 /16 *9
+
             deltaMouse.x = Mathf.RoundToInt((mouse.x - startMouse.x) /1) *1
-            deltaMouse.y = Mathf.RoundToInt((mouse.y - startMouse.y) /1) *1
+            deltaMouse.y = Mathf.RoundToInt((mouse.y - startMouse.y) /4) *4
             transform.localPosition = Vector2.Lerp(transform.localPosition,
                                             Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), 
                                                     Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44)),
@@ -218,11 +219,13 @@ public class NoteSection (MonoBehaviour):
         #         instrumentChanger.instruments[x].PlayNote(n, z)
 
         # else:
-        y = scaleChanger.NoteOffset(y, false)
+        if not instrument.isDrumSet:
+            y = scaleChanger.NoteOffset(y, false)
         instrument.PlayNote(y, z)        
 
     public def StopPlayingNote(y as int):
-        y = scaleChanger.NoteOffset(y, false)
+        if not instrument.isDrumSet:
+            y = scaleChanger.NoteOffset(y, false)
         instrument.StopPlayingNote(y)
 
     public def UpdateInstrument(newInstrument as Instrument):
@@ -351,11 +354,12 @@ public class NoteSection (MonoBehaviour):
 
     public def BeginDrag():
         # print("begin drag")
-        startMouse = mouse
+        startMouse = Vector2(Input.mousePosition.x / Screen.width * 100, Input.mousePosition.y / Screen.height * 100 /16 *9)
         startPosition = transform.localPosition
 
     public def EndDrag():
-        transform.localPosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
+        desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
+        transform.localPosition = musicScore.FindAvailableSpace(desirablePosition.x, desirablePosition.y, noteSectionRectTransform.sizeDelta.x)
         startMouse = Vector2.zero
 
     public def NumberOfNotes() as int:
