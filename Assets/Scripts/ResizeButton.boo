@@ -11,10 +11,17 @@ class ResizeButton (MonoBehaviour):
     public noteSection as NoteSection
     public noteSectionRectTransform as RectTransform
 
+    public direction as Direction
+
     private originalPosition as single
 
+    enum Direction:
+        Left
+        Right
+
     def Start():
-        rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
+        if direction == Direction.Right:
+            rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
         originalPosition = rectTransform.anchoredPosition.x
 
     public def BeginDrag():
@@ -24,9 +31,13 @@ class ResizeButton (MonoBehaviour):
     public def EndDrag():
         print("end drag: " + deltaMouseX)
         startMouseX = 0
-        noteSection.AddLength(deltaMouseX)
-        # if rectTransform.sizeDelta.x > noteSection.sectionLength / 8:
-        rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
+        
+        if direction == Direction.Left:
+            addDirection = Vector2.left
+        else:
+            addDirection = Vector2.right
+
+        noteSection.AddLength(deltaMouseX, Vector2.right)
         originalPosition = rectTransform.anchoredPosition.x
 
     public def Update():

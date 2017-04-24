@@ -161,8 +161,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             else:
                 //trim empty space at the end, not used in the recording
                 recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
-                currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8)
-                currentNoteSection.resizeButton.anchoredPosition.x = currentNoteSection.sectionLength / 8
+                currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
+                currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
 
 
 
@@ -268,16 +268,21 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             noteSections.Remove(currentNoteSection)
             Destroy(currentNoteSection.gameObject)
 
-    def FindAvailableSpace(x as int, y as int, width as int) as Vector2:
+    def FindAvailableSpace(noteSection as NoteSection, x as int, y as int, width as int) as Vector2:
 
         for nS in noteSections:
-            //limit y
-            currentRect = nS.GetComponent(RectTransform)
-            if currentRect.anchoredPosition.y == y:
-                print("same line")
-                if x >= currentRect.anchoredPosition.x and x < currentRect.anchoredPosition.x + currentRect.sizeDelta.x:
-                    print("space conflict")
-                    x = currentRect.anchoredPosition.x + currentRect.sizeDelta.x
+            if nS != noteSection:
+                //limit y
+                currentRect = nS.GetComponent(RectTransform)
+                if currentRect.anchoredPosition.y == y:
+                    print("same line")
+                    if x >= currentRect.anchoredPosition.x and x < currentRect.anchoredPosition.x + currentRect.sizeDelta.x:
+                        print("space conflict")
+                        x = currentRect.anchoredPosition.x + currentRect.sizeDelta.x
+                        if not FindAvailableSpace(noteSection, x, y, width) == Vector2(x,y):
+                            print("move note sections on line forward")
+                    elif x < currentRect.anchoredPosition.x and x+width < currentRect.anchoredPosition.x + currentRect.sizeDelta.x:
+                        x = currentRect.anchoredPosition.x - width
 
         availablePosition = Vector2(x,y)
         return availablePosition 

@@ -45,7 +45,8 @@ public class NoteSection (MonoBehaviour):
     public sectionLength as int = 64
     public loops as single = 1f
     public loopsLeft as single
-    public resizeButton as RectTransform
+    public resizeButtonLeft as RectTransform
+    public resizeButtonRight as RectTransform
     public loopButton as RectTransform
     private maxNotes as int = 128
     private tempoMarkers as (int)
@@ -57,8 +58,12 @@ public class NoteSection (MonoBehaviour):
     public mouse as Vector2
     public deltaMouse as Vector2
     private startPosition as Vector2
+
     private lastTimeClicked as single
+    public canvasGrid as Image
+    public handles as GameObject
     public zoomOutButton as GameObject
+    
     public indicator as Transform
     private originalPosition as Vector3
     private canMoveStuff as bool = true
@@ -249,38 +254,70 @@ public class NoteSection (MonoBehaviour):
         loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
 
 
-    public def AddLength(length as int):
+    public def AddLength(length as int, direciton as Vector2):
+        print("add: " + length)
         length *= 8
 
-        if length > 0:
-            sectionLength = notes.GetLength(0) + length
-            newNotes = matrix(single, sectionLength, maxNotes)
+        if direciton == Vector2.right:
+            if length > 0:
+                newLength = notes.GetLength(0) + length
+                newNotes = matrix(single, newLength, maxNotes)
 
-            for x in range(notes.GetLength(0)):
-                for y in range(notes.GetLength(1)):
-                    newNotes[x,y] = notes[x,y]
+                for x in range(notes.GetLength(0)):
+                    for y in range(notes.GetLength(1)):
+                        newNotes[x,y] = notes[x,y]
+                notes = newNotes
 
-            notes = newNotes
-
-            guiLength = sectionLength /8
-            if noteSectionRectTransform.sizeDelta.x < guiLength:
-                noteSectionRectTransform.sizeDelta.x = guiLength
-        else:
-            //find actual width without empty space
-            x = notes.GetLength(0)-1
-            while x > 0:
-                for y in range(maxNotes):
-                    if notes[x,y] > 0:
-                        maxX = x
-                        x = 0
-                        break
-                x--
-
-            if maxX < notes.GetLength(0) + length:
-                TruncateEnd(length)
+                guiLength = newLength /8
+                resizeButtonRight.anchoredPosition.x = guiLength
+                if noteSectionRectTransform.sizeDelta.x < guiLength:
+                    noteSectionRectTransform.sizeDelta.x = guiLength
             else:
-                //TODO: show warning
-                TruncateEnd(length)
+                //find actual width without empty space
+                x = notes.GetLength(0)-1
+                while x > 0:
+                    for y in range(maxNotes):
+                        if notes[x,y] > 0:
+                            maxX = x
+                            x = 0
+                            break
+                    x--
+
+                if maxX < notes.GetLength(0) + length:
+                    TruncateEnd(length)
+                else:
+                    //TODO: show warning
+                    TruncateEnd(length)
+        else:
+            if length > 0:
+                newLength = length + notes.GetLength(0)
+                newNotes = matrix(single, newLength, maxNotes)
+
+                for x in range(length, notes.GetLength(0)):
+                    for y in range(notes.GetLength(1)):
+                        newNotes[x,y] = notes[x,y]
+                notes = newNotes
+
+                guiLength = newLength /8
+                resizeButtonLeft.anchoredPosition.x = 0
+                if noteSectionRectTransform.sizeDelta.x < guiLength:
+                    noteSectionRectTransform.sizeDelta.x += guiLength
+            else:
+                //find actual width without empty space
+                x = notes.GetLength(0)-1
+                while x > 0:
+                    for y in range(maxNotes):
+                        if notes[x,y] > 0:
+                            maxX = x
+                            x = 0
+                            break
+                    x--
+
+                if maxX < notes.GetLength(0) + length:
+                    TruncateEnd(length)
+                else:
+                    //TODO: show warning
+                    TruncateEnd(length)
 
 
         CalculateLoops()
@@ -296,8 +333,6 @@ public class NoteSection (MonoBehaviour):
                 newNotes[x,y] = notes[x,y]
 
         notes = newNotes
-
-        noteSectionRectTransform.sizeDelta.x = sectionLength /8
 
         for noteBox in canvasButton.GetComponentsInChildren[of RectTransform]():
             if noteBox.anchoredPosition.x > sectionLength and noteBox != indicator:
@@ -326,12 +361,14 @@ public class NoteSection (MonoBehaviour):
         canMoveStuff = false
         originalPosition = transform.localPosition
         transform.localPosition = Vector3(12,4,0)
-        transform.localScale = Vector3.one * 10f
+        transform.localScale = Vector3.one * 8f
 
+        canvasGrid.enabled = true
+        handles.SetActive(false)
         
         zoomOutButton.SetActive(true)
-        outline.effectDistance = Vector2.one * 0.5f
-        outline.effectColor = Color.blue
+        outline.effectDistance = Vector2.one * 0.05f
+        outline.effectColor = Color.grey
 
     public def Select():
         if Input.GetKey(KeyCode.LeftShift) == false:
@@ -344,9 +381,9 @@ public class NoteSection (MonoBehaviour):
         if instrumentChanger.instrumentToChangeTo != null:
             UpdateInstrument(instrumentChanger.instrumentToChangeTo)
 
-        # if lastTimeClicked + 0.2f > Time.time:
-        #     ZoomIn()
-        # lastTimeClicked = Time.time
+        if lastTimeClicked + 0.2f > Time.time:
+            ZoomIn()
+        lastTimeClicked = Time.time
 
     public def Deselect():
         outline.effectDistance = Vector2.zero
@@ -359,7 +396,7 @@ public class NoteSection (MonoBehaviour):
 
     public def EndDrag():
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
-        transform.localPosition = musicScore.FindAvailableSpace(desirablePosition.x, desirablePosition.y, noteSectionRectTransform.sizeDelta.x)
+        transform.localPosition = musicScore.FindAvailableSpace(self, desirablePosition.x, desirablePosition.y, noteSectionRectTransform.sizeDelta.x)
         startMouse = Vector2.zero
 
     public def NumberOfNotes() as int:
