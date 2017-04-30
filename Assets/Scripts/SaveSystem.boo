@@ -87,11 +87,10 @@ public class SaveSystem (MonoBehaviour):
 
             //whole loops
             tex.SetPixel(posX + 2, (noteSection.transform.localPosition.y * 32) +2, Color32(0, Mathf.FloorToInt(noteSection.loops), 0, 0)) //max 255 loops :/
-            posX += 1
 
             //partial loops
             if noteSection.loops - Mathf.FloorToInt(noteSection.loops) > 0f:
-                tex.SetPixel(posX, (noteSection.transform.localPosition.y * 32) +2, Color(noteSection.loops - Mathf.FloorToInt(noteSection.loops), 0, 0))
+                tex.SetPixel(posX + 3, (noteSection.transform.localPosition.y * 32) +2, Color(noteSection.loops - Mathf.FloorToInt(noteSection.loops), 0, 0))
 
             //end section
             tex.SetPixel(((noteSection.transform.localPosition.x * 8) + noteSection.transform.GetComponent(RectTransform).sizeDelta.x * 8) -1, (noteSection.transform.localPosition.y * 32) +2, Color.blue)
@@ -194,32 +193,33 @@ public class SaveSystem (MonoBehaviour):
             color = tex.GetPixel(x + scaleChanger.scaleLength + 2, 1)
             scaleChanger.noteOffset = color.r
 
+            for h in range(tex.height):
+                for w in range(tex.width):
+                    //find note section start
+                    if tex.GetPixel(w,h) == Color.green:
+                        # print("found note section start")
+                        startPosition = w
+                        i = startPosition
+                        //find note section end
+                        while i <= tex.width:
+                            if tex.GetPixel(i,h) == Color.blue:
+                                # print("found note section end")
+                                noteSectionLength = i - startPosition +1
+                                break
+                            i++ 
+
+                        noteSection = musicScore.CreateNoteSection(Vector2(w /8, Mathf.FloorToInt((h-2)/32)), noteSectionLength)
+                        instIndex as Color32 = tex.GetPixel(w+1, h)
+                        print(instIndex.r)
+                        noteSection.UpdateInstrument(instrumentChanger.instruments[instIndex.r])
+
+                        for x in range(noteSectionLength):
+                            for y in range(128):
+                                noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)                        
 
         else:
             print("file does not exist")
 
-        for h in range(tex.height):
-            for w in range(tex.width):
-                //find note section start
-                if tex.GetPixel(w,h) == Color.green:
-                    # print("found note section start")
-                    startPosition = w
-                    i = startPosition
-                    //find note section end
-                    while i <= tex.width:
-                        if tex.GetPixel(i,h) == Color.blue:
-                            # print("found note section end")
-                            noteSectionLength = i - startPosition +1
-                            break
-                        i++ 
-
-                    noteSection = musicScore.CreateNoteSection(Vector2(w /8, Mathf.FloorToInt((h-2)/32)), noteSectionLength)
-                    color = tex.GetPixel(w+1, h)
-                    noteSection.UpdateInstrument(instrumentChanger.instruments[color.r])
-
-                    for x in range(noteSectionLength):
-                        for y in range(128):
-                            noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)                        
 
 
 

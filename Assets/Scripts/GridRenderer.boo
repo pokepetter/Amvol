@@ -12,11 +12,10 @@ class GridRenderer (MonoBehaviour):
 
     def Awake():
         rectTransform = gameObject.GetComponent(RectTransform)
-        width = rectTransform.sizeDelta.x
-        height = rectTransform.sizeDelta.y
+        width = rectTransform.rect.width
+        height = rectTransform.rect.height
 
         lineRenderer = gameObject.AddComponent(UILineRenderer)
-        # lineRenderer.positionCount = (width / spacingX) + (height / spacingY)
         lineRenderer.material = material
         lineRenderer.lineThickness = thickness
 

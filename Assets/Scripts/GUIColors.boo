@@ -8,7 +8,7 @@ class GUIColors (MonoBehaviour):
     public x as int
     public y as int
 
-    def Update():
+    def Awake():
         if palette != null:
             color = palette.GetPixel(x,y)
             if transform.GetComponent(Image) != null:

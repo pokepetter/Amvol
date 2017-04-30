@@ -47,12 +47,12 @@ public class NoteSection (MonoBehaviour):
     public loopsLeft as single
     public resizeButtonLeft as RectTransform
     public resizeButtonRight as RectTransform
-    public loopButton as RectTransform
+    public loopButtonRight as RectTransform
     private maxNotes as int = 128
     private tempoMarkers as (int)
 
     public outline as Outline
-
+    public scrollRect as ScrollRect
 
     public startMouse as Vector2
     public mouse as Vector2
@@ -61,6 +61,7 @@ public class NoteSection (MonoBehaviour):
 
     private lastTimeClicked as single
     public canvasGrid as Image
+    public canvasButtonButton as Button
     public handles as GameObject
     public zoomOutButton as GameObject
     
@@ -71,13 +72,20 @@ public class NoteSection (MonoBehaviour):
     def Awake():
         scaleChanger = Amvol.GetScaleChanger()
         musicScore = Amvol.GetMusicScore()
-        # SetLength(sectionLength)
         instrumentChanger = Amvol.GetInstrumentChanger()
         UpdateInstrument(instrumentChanger.currentInstrument)
         input = array(single, maxNotes)
         transform.localScale = Vector3.zero
         DerpLerp.Scale(transform, Vector3.one, 0.2f)
+        
+        canvasGrid.enabled = false
+        canvasButtonButton.enabled = false
+        handles.SetActive(true)
+        scrollRect.enabled = false
 
+        zoomOutButton.SetActive(false)
+        outline.effectDistance = Vector2.one * 0.05f
+        outline.effectColor = Color.grey
 
     def Update():
         # if Input.GetKeyDown(KeyCode.LeftArrow):
@@ -205,11 +213,26 @@ public class NoteSection (MonoBehaviour):
         input[y] = z
 
     public def StopNote(y as int):
+        tempY = 0
+        tempX = 0
+        for tempY in range(maxNotes):
+            for tempX in range(256):
+                if notes[x,y] > 0.01f:
+                    nextNoteX = tempX
+                    nextNoteY = tempY
+
+        for i in range(256):
+            if notes[nextNoteX+i,nextNoteY] < 0.01f:
+                # print("nextNoteLength is: " + i)
+                break
+
+        # noteLengthInTime = beatTime * nextNoteLength
+        # instrument.attack = 
+
+
         input[y] = 0
 
     public def PlayNote(y as int, z as single):
-
-
         # if harmonyMode == true:
         #     # for i in range(128):
         #     #     StopPlayingNote(i)
@@ -224,6 +247,7 @@ public class NoteSection (MonoBehaviour):
         #         instrumentChanger.instruments[x].PlayNote(n, z)
 
         # else:
+
         if not instrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
         instrument.PlayNote(y, z)        
@@ -242,6 +266,7 @@ public class NoteSection (MonoBehaviour):
         notes = matrix(single, length, maxNotes)
         sectionLength = length
         noteSectionRectTransform.sizeDelta.x = length /8f
+        canvasButton.sizeDelta.x = sectionLength
         # canvas.sizeDelta.x = length
         # canvasButton.sizeDelta = Vector2(length, maxNotes)
         # timeline.sizeDelta.x = length
@@ -257,6 +282,7 @@ public class NoteSection (MonoBehaviour):
     public def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
         length *= 8
+        canvasButton.sizeDelta.x += length
 
         if direciton == Vector2.right:
             if length > 0:
@@ -272,6 +298,7 @@ public class NoteSection (MonoBehaviour):
                 resizeButtonRight.anchoredPosition.x = guiLength
                 if noteSectionRectTransform.sizeDelta.x < guiLength:
                     noteSectionRectTransform.sizeDelta.x = guiLength
+                    loopButtonRight.localPosition.x = guiLength
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -339,6 +366,8 @@ public class NoteSection (MonoBehaviour):
                 Destroy(noteBox.gameObject)
 
 
+
+
     public def SetBPM(newBPM as int):
         BPM = newBPM
 
@@ -350,25 +379,37 @@ public class NoteSection (MonoBehaviour):
         # newTempoMarker.transform.SetParent(timeline, false)
         # newTempoMarker.transform.localPosition.x = x
 
-    public def ZoomOut():
-        transform.localPosition = originalPosition
-        transform.localScale = Vector3.one
-        canvasButton.gameObject.SetActive(false)
-        zoomOutButton.SetActive(false)
-        canMoveStuff = true
-
     public def ZoomIn():
         canMoveStuff = false
-        originalPosition = transform.localPosition
-        transform.localPosition = Vector3(12,4,0)
+        originalPosition = transform.parent.GetComponent(RectTransform).anchoredPosition
+        transform.parent.GetComponent(RectTransform).anchoredPosition = Vector2(-noteSectionRectTransform.anchoredPosition.x +4, -noteSectionRectTransform.anchoredPosition.y +4)
         transform.localScale = Vector3.one * 8f
 
         canvasGrid.enabled = true
+        canvasButtonButton.enabled = true
+        canvasButton.sizeDelta.x = sectionLength
         handles.SetActive(false)
+        scrollRect.enabled = true
         
         zoomOutButton.SetActive(true)
         outline.effectDistance = Vector2.one * 0.05f
         outline.effectColor = Color.grey
+
+    public def ZoomOut():
+        canMoveStuff = true
+        transform.parent.GetComponent(RectTransform).anchoredPosition = originalPosition
+        transform.localScale = Vector3.one
+
+        canvasGrid.enabled = false
+        canvasButtonButton.enabled = false
+        handles.SetActive(true)
+        scrollRect.enabled = false
+
+        zoomOutButton.SetActive(false)
+        outline.effectDistance = Vector2.one * 0.05f
+        outline.effectColor = Color.grey
+
+
 
     public def Select():
         if Input.GetKey(KeyCode.LeftShift) == false:

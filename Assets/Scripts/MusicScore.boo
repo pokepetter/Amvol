@@ -39,7 +39,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public instrumentChanger as InstrumentChanger
     
-    private projectLength as int = 240
+    private projectLength as int = 240 * 5
     private layers as int = 128
     private tempoMarkers as (int)
 
@@ -52,8 +52,11 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     def Awake():
         noteSections = List of NoteSection()
         canvasButton.transform.localPosition = Vector2.zero 
+        canvasButton.sizeDelta = Vector2(projectLength, layers)
 
     def NewProject():
+        if noteSections.Count > 0 or instrumentChanger.instruments.Count > 0:
+            print("warning")
         for nS in noteSections:
             Destroy(nS.gameObject)
         noteSections.Clear()
@@ -160,6 +163,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                 currentNoteSection = null
             else:
                 //trim empty space at the end, not used in the recording
+                currentRect = currentNoteSection.GetComponent(RectTransform)
+                currentRect.sizeDelta.x = Mathf.CeilToInt(currentRect.sizeDelta.x)
                 recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
                 currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
                 currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
@@ -229,15 +234,15 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent(RectTransform), ped.position, ped.pressEventCamera, localCursorPosition) and Input.GetKey(KeyCode.LeftAlt) == false:
             localCursorPosition = Vector2(Mathf.Round(localCursorPosition.x /1) *1, Mathf.FloorToInt(localCursorPosition.y /4) *4)
 
-        cursor.localPosition = localCursorPosition
         x = localCursorPosition.x * 8 / canvasButton.transform.localScale.x
-        timeIndicator.localPosition.x = x * 0.125f 
+        timeIndicator.localPosition.x = x * 0.125f
+        cursor.localPosition = Vector3(timeIndicator.localPosition.x, localCursorPosition.y)
 
         DeselectAll()
         instrumentChanger.instrumentToChangeTo = null
 
         if lastTimeClicked + 0.2f > Time.time:
-            CreateNoteSection(localCursorPosition, 64)
+            CreateNoteSection(cursor.localPosition, 64)
         lastTimeClicked = Time.time
 
     public def CreateMetronomeNoteSection(position as Vector2, startLength as int) as NoteSection:
@@ -254,6 +259,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         noteSectionObject.transform.GetComponent(RectTransform).sizeDelta.x = startLength
         noteSection = noteSectionObject.GetComponent(NoteSection)
         noteSection.SetLength(startLength)
+        noteSection.loopButtonRight.localPosition.x = noteSection.noteSectionRectTransform.sizeDelta.x
         noteSections.Add(noteSection)
         currentNoteSection = noteSection
         noteSection.Select()

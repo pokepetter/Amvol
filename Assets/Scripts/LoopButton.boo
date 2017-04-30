@@ -25,7 +25,7 @@ class LoopButton (MonoBehaviour):
         startMouseX = 0
         originalWidth = noteSectionRectTransform.sizeDelta.x
         noteSection.CalculateLoops()
-        # rectTransform.sizeDelta.x = originalWidth
+        rectTransform.localPosition.x = originalWidth
 
         # noteSectionRectTransform.sizeDelta.x += deltaMouseX
         # noteSection.loops = 3
