@@ -67,9 +67,9 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         instrumentChanger.Initialize()
         tempoTapper.tempo = 60
 
-    def FixedUpdate():
+    # def FixedUpdate():
         // beat time is a 32th note
-        beatTime = 7.5f / tempoTapper.tempo
+        # beatTime = 7.5f / tempoTapper.tempo
         // 60f / 16 / BPM
 
 
@@ -218,7 +218,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         timeIndicator.localPosition.x = 0
 
     public def SetBPM(newBPM as int):
-        BPM = newBPM
+        beatTime = 7.5f / newBPM
+        print("set BPM to " + newBPM)
 
     public def CreateTempoMarker(x as int, newTempo as int):
         timeline.sizeDelta.x = projectLength
