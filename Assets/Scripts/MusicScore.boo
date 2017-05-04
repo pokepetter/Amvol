@@ -276,6 +276,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             Destroy(currentNoteSection.gameObject)
 
     def FindAvailableSpace(noteSection as NoteSection, x as int, y as int, width as int) as Vector2:
+        x *= canvasButton.localScale.x
+        width *= canvasButton.localScale.x
 
         for nS in noteSections:
             if nS != noteSection:

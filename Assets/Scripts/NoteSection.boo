@@ -437,7 +437,10 @@ public class NoteSection (MonoBehaviour):
 
     public def EndDrag():
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
-        transform.localPosition = musicScore.FindAvailableSpace(self, desirablePosition.x, desirablePosition.y, noteSectionRectTransform.sizeDelta.x)
+        transform.localPosition = musicScore.FindAvailableSpace(self, 
+                                desirablePosition.x, 
+                                desirablePosition.y, 
+                                noteSectionRectTransform.sizeDelta.x)
         startMouse = Vector2.zero
 
     public def NumberOfNotes() as int:
