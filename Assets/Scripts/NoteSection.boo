@@ -88,30 +88,11 @@ public class NoteSection (MonoBehaviour):
         outline.effectColor = Color.grey
 
     def Update():
-        # if Input.GetKeyDown(KeyCode.LeftArrow):
-        #     transform.localScale.x /= 2
-        #     cavasButton.material = canvasBgMat
-        #     canvasBgMat.mainTextureScale.x *= 2
-
-        #     # cavasButton.sprite = bg2
-        #     transform.parent.GetComponent(RectTransform).sizeDelta.x /= 2
-
-        # if Input.GetKeyDown(KeyCode.RightArrow) and transform.localScale.x < 1:
-        #     transform.localScale.x *= 2
-        #     canvasBgMat.mainTextureScale.x /= 2
-        #     transform.parent.GetComponent(RectTransform).sizeDelta.x *= 2
-
-        # if Input.GetKeyDown(KeyCode.Space):
-        #     PlayButton()
-
         # if Input.GetKey(KeyCode.LeftControl) and Input.GetKeyDown(KeyCode.H):
         #     if harmonyMode == false:
         #         harmonyMode = true
         #     else:
         #         harmonyMode = false
-
-        # if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.S):
-        #     Amvol.GetSaveSystem().Save(notes, "Untitled")
 
 
         if startMouse != Vector2.zero and canMoveStuff:
@@ -143,9 +124,11 @@ public class NoteSection (MonoBehaviour):
                                 PlayNote(y, notes[x,y]) 
                         if isRecording:
                             if input[y] > 0f:
-                                roundedX = Mathf.RoundToInt(x/musicScore.snap) * musicScore.snap
-                                for i in range(musicScore.snap):
-                                    SetNote(roundedX + i, y, input[y])
+                                //rounding cause lag
+                                # roundedX = Mathf.RoundToInt(x/musicScore.snap) * musicScore.snap
+                                # for i in range(musicScore.snap):
+                                #     SetNote(roundedX + i, y, input[y])
+                                SetNote(x, y, input[y])
                         if notes[x,y] == 0f and x > 0 and notes[x-1,y] > 0f:
                             StopPlayingNote(y)
                         y++
@@ -207,6 +190,12 @@ public class NoteSection (MonoBehaviour):
             instNote = Instantiate(notePrefab)
             instNote.transform.SetParent(canvasButton, false)
             instNote.transform.localPosition = Vector3(x, y, z)
+        else:
+            instNotePos = Vector3()
+            for i in range(canvasButton.childCount):
+                instNotePos = canvasButton.GetChild(i).transform.localPosition
+                if Mathf.RoundToInt(instNotePos.x) == x and Mathf.RoundToInt(instNotePos.y) == y:
+                    Destroy(canvasButton.GetChild(i).gameObject)
 
     public def StartNote(y as int, z as single):
         # print("start note: " + y + "/" + z)
@@ -449,3 +438,20 @@ public class NoteSection (MonoBehaviour):
             if n > 0:
                 i++
         return i
+
+
+    public def Quantize(snap as int):
+        for y in range(maxNotes):
+            for x in range(1, notes.GetLength(0), 1):
+                if notes[x,y] > 0 and notes[x-1,y] == 0:
+                    snapSingle as single = snap
+                    closestRoundedX as int = Mathf.Round(x/snapSingle) * snapSingle
+                    if closestRoundedX < x:
+                        for i in range(x-closestRoundedX):
+                            try:
+                                SetNote(closestRoundedX+i, y, notes[x,y])
+                            except:
+                                print("out of range")
+                    elif closestRoundedX > x:
+                        for i in range(closestRoundedX-x):
+                            SetNote(x+i, y, 0f)

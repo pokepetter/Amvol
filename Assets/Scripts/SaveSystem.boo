@@ -17,6 +17,10 @@ public class SaveSystem (MonoBehaviour):
     private y as int
     private audioClip as AudioClip
 
+
+    def Awake():
+        Load(Environment.GetCommandLineArgs()[0])
+
     public def Save(saveName as string):
         tex = Texture2D.blackTexture
         
