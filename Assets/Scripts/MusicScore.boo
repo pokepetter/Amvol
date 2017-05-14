@@ -35,6 +35,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public timeline as RectTransform
     public timeIndicator as Transform
+    public pauseButton as GameObject
+    public recordingActiveButton as GameObject
     public cursor as Transform
 
     public instrumentChanger as InstrumentChanger
@@ -45,6 +47,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     private localCursorPosition as Vector2
     private lastTimeClicked as single
+    private originalCanvasButtonX as single
     private originalPosition as int
     
 
@@ -123,6 +126,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                 currentTime = 0
                 y = 0
                 x++
+                if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
+                    canvasButton.localPosition.x -= 0.125f * canvasButton.localScale.x
 
                 if recording and newNoteSection != null:
                     newNoteSection.sizeDelta.x += 0.125f
@@ -132,8 +137,9 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
 
     def Record():
-        if recording == false:
+        if not recording:
             recording = true
+            recordingActiveButton.SetActive(true)
             Play()
             //find open space for the note section
             openPosition = cursor.transform.localPosition
@@ -149,12 +155,11 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             currentNoteSection.isRecording = true
             newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
             newNoteSection.sizeDelta.x = 0
-            print("start recording")
-            # recordButton.SetActive(true)
+            
         else:
             recording = false
-            print("stop recording")
-            Play()
+            recordingActiveButton.SetActive(false)
+            Stop()
             currentNoteSection.playing = false
             currentNoteSection.isRecording = false
             if currentNoteSection.NumberOfNotes() == 0:
@@ -172,8 +177,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
 
     def Play():
-        if playing == false:
+        if not playing:
             playing = true
+            originalCanvasButtonX = canvasButton.localPosition.x
+            pauseButton.SetActive(true)
             originalPosition = x
             for noteSection in noteSections:
                 if noteSection.transform.localPosition.x * 8 >= originalPosition: //play from indicator
@@ -191,20 +198,20 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             for noteSection in noteSections:
                 noteSection.Stop()
             metronomeNoteSection.Stop()
+            canvasButton.localPosition.x = originalCanvasButtonX
             x = originalPosition
+            pauseButton.SetActive(false)
             timeIndicator.localPosition.x = x * 0.125f
             # currentTimeText.text = x.ToString()
             y = 0
             playing = false
             if recording:
                 recording = false
-                # print("stop recording")
                 currentNoteSection.playing = false
                 currentNoteSection.isRecording = false
                 if currentNoteSection.NumberOfNotes() == 0:
                     Destroy(currentNoteSection.gameObject)
                     currentNoteSection = null
-                # recordButton.SetActive(false)
 
     def Pause():
         if playing:
@@ -216,6 +223,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             Play()
         x = 0
         timeIndicator.localPosition.x = 0
+        recordingActiveButton.SetActive(false)
 
     public def SetBPM(newBPM as int):
         beatTime = 7.5f / newBPM

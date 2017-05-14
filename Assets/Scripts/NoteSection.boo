@@ -64,6 +64,8 @@ public class NoteSection (MonoBehaviour):
     public canvasButtonButton as Button
     public handles as GameObject
     public zoomOutButton as GameObject
+    public playButton as GameObject
+    public stopButton as GameObject
     
     public indicator as Transform
     private originalPosition as Vector3
@@ -140,10 +142,10 @@ public class NoteSection (MonoBehaviour):
                             y = 0
                             loopsLeft -= 1f
                             if loopsLeft <= 0f:
-                                playing = false
+                                Stop()
                     else:
                         if x >= sectionLength * loopsLeft:
-                            playing = false
+                            Stop()
                     
 
 
@@ -167,6 +169,8 @@ public class NoteSection (MonoBehaviour):
             loopsLeft = loops
             x = 0
         currentPositionOnTimeline = x
+        stopButton.SetActive(true)
+        playButton.SetActive(false)
         playing = true
 
     def Stop():
@@ -174,6 +178,8 @@ public class NoteSection (MonoBehaviour):
         y = 0
 
         playing = false
+        stopButton.SetActive(false)
+        playButton.SetActive(true)
 
         for i in range(128):
             StopPlayingNote(i)
@@ -372,7 +378,8 @@ public class NoteSection (MonoBehaviour):
         canMoveStuff = false
         originalPosition = transform.parent.GetComponent(RectTransform).anchoredPosition
         transform.parent.GetComponent(RectTransform).anchoredPosition = Vector2(-noteSectionRectTransform.anchoredPosition.x +4, -noteSectionRectTransform.anchoredPosition.y +4)
-        transform.localScale = Vector3.one * 8f
+        transform.localScale = Vector3.one * 6f
+        noteSectionRectTransform.sizeDelta.y = 6f
 
         canvasGrid.enabled = true
         canvasButtonButton.enabled = true
@@ -388,6 +395,7 @@ public class NoteSection (MonoBehaviour):
         canMoveStuff = true
         transform.parent.GetComponent(RectTransform).anchoredPosition = originalPosition
         transform.localScale = Vector3.one
+        noteSectionRectTransform.sizeDelta.y = 3.85f
 
         canvasGrid.enabled = false
         canvasButtonButton.enabled = false

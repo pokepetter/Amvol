@@ -28,7 +28,7 @@ class ScaleList (MonoBehaviour):
                     DestroyImmediate(content.GetChild(0).gameObject)
 
         currentDirectory = System.IO.Directory.GetCurrentDirectory()
-        filePathToAdd = Path.Combine("Assets", "scales.txt")
+        filePathToAdd = "scales.txt"
 
         ShowTextFile(Path.Combine(currentDirectory, filePathToAdd))
 
