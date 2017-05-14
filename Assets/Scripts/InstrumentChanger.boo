@@ -107,7 +107,8 @@ class InstrumentChanger (MonoBehaviour):
         currentInstrument.StopPlayingNote(y)
 
     public def ClearAllInstruments():
-        instruments.Clear()
+        if instruments != null:
+            instruments.Clear()
         currentInstrument = null
         instrumentIndex = 0
         for instrument in instrumentsParent.GetComponentsInChildren(Instrument):
