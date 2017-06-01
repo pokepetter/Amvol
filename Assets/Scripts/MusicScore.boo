@@ -1,6 +1,8 @@
 import UnityEngine
 import System.Collections
 import UnityEngine.UI
+import MidiJack
+
 
 public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
@@ -19,7 +21,6 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public canvasButton as RectTransform
     public canvasBgMat as Material
-    public tempoTapper as TempoTapper
     public beatTime as single
     
     private k as int = 0
@@ -50,7 +51,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     private originalCanvasButtonX as single
     private originalPosition as int
     
-
+    public getTempoBeforeRecording as bool
+    private waitForTempoInput as bool
+    private beatInputsLeft as int
+    public tempoTapper as TempoTapper
 
     def Awake():
         noteSections = List of NoteSection()
@@ -70,11 +74,6 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         instrumentChanger.Initialize()
         tempoTapper.tempo = 60
 
-    # def FixedUpdate():
-        // beat time is a 32th note
-        # beatTime = 7.5f / tempoTapper.tempo
-        // 60f / 16 / BPM
-
 
     def OnScroll(eventData as PointerEventData):
         ZoomCanvas(Vector2(eventData.scrollDelta.y, 0f))
@@ -88,7 +87,6 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         canvasButton.localScale.x = Mathf.Clamp(canvasButton.localScale.x, 0.05f, 2f)    
         canvasButton.GetComponent(Image).material = canvasBgMat  
         canvasBgMat.mainTextureScale.x = canvasButton.localScale.x
-
 
 
     def Update():
@@ -110,15 +108,30 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if Input.GetKeyDown(KeyCode.Delete):
             DeleteSelectedNoteSections()
 
-        # if Input.GetKey(KeyCode.LeftControl) and Input.GetKeyDown(KeyCode.H):
-        #     if harmonyMode == false:
-        #         harmonyMode = true
-        #     else:
-        #         harmonyMode = false
+        if waitForTempoInput:
+            if Input.anyKeyDown:
+                tempoTapper.Click()
+                beatInputsLeft--
+                print(beatInputsLeft)
+                if beatInputsLeft <= 0:
+                    tempoTapper.started = false
+                    tempoTapper.ApplyTempo()
+                    getTempoBeforeRecording = false
+                    waitForTempoInput = false
+                    Record()
 
-        # if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.S):
-        #     Amvol.GetSaveSystem().Save(notes, "Untitled")
-
+            while k < 128:
+                if MidiMaster.GetKeyDown(k):
+                    beatInputsLeft--
+                    print(beatInputsLeft)
+                    if beatInputsLeft <= 0:
+                        getTempoBeforeRecording = false
+                        waitForTempoInput = false
+                        Record()
+                    break
+                k++
+            if k >= 128:
+                k = 0
 
         if playing:
             currentTime += Time.fixedDeltaTime/beatTime
@@ -135,26 +148,34 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             timeIndicator.localPosition.x = x * 0.125f
             # currentTimeText.text = x.ToString()
 
+    def Record(newGetTempoBeforeRecording as bool):
+        getTempoBeforeRecording = newGetTempoBeforeRecording
+        Record()
+
 
     def Record():
         if not recording:
-            recording = true
-            recordingActiveButton.SetActive(true)
-            Play()
-            //find open space for the note section
-            openPosition = cursor.transform.localPosition
-            for nS in noteSections:
-                if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y) 
-                and Mathf.RoundToInt(openPosition.x) < Mathf.RoundToInt(nS.transform.localPosition.x + nS.GetComponent(RectTransform).sizeDelta.x)
-                ):
-                    openPosition.y += 4f
+            if getTempoBeforeRecording:
+                beatInputsLeft = 5
+                waitForTempoInput = true
+            else:
+                recording = true
+                recordingActiveButton.SetActive(true)
+                Play()
+                //find open space for the note section
+                openPosition = cursor.transform.localPosition
+                for nS in noteSections:
+                    if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y) 
+                    and Mathf.RoundToInt(openPosition.x) < Mathf.RoundToInt(nS.transform.localPosition.x + nS.GetComponent(RectTransform).sizeDelta.x)
+                    ):
+                        openPosition.y += 4f
 
-            currentNoteSection = CreateNoteSection(openPosition, 0)
-            currentNoteSection.SetLength(projectLength*8)
-            currentNoteSection.playing = true
-            currentNoteSection.isRecording = true
-            newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
-            newNoteSection.sizeDelta.x = 0
+                currentNoteSection = CreateNoteSection(openPosition, 0)
+                currentNoteSection.SetLength(projectLength*8)
+                currentNoteSection.playing = true
+                currentNoteSection.isRecording = true
+                newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
+                newNoteSection.sizeDelta.x = 0
             
         else:
             recording = false

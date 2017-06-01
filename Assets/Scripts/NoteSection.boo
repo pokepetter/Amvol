@@ -20,10 +20,6 @@ public class NoteSection (MonoBehaviour):
     private k as int = 0
 
     public notes as (single, 2)
-    // a note is composed of
-    // position on timeline
-    // note/pitch
-    // volume/power
 
     public x as int //pos
     private y as int //note
@@ -162,9 +158,7 @@ public class NoteSection (MonoBehaviour):
             x = 0
         elif delay < 0:
             loopsLeft = loops - Mathf.FloorToInt(-delay/ sectionLength)
-            # print(loopsLeft)
             x = -delay - ((loops-loopsLeft) * sectionLength)
-            # x = -delay / (loops-loopsLeft)
         else:
             loopsLeft = loops
             x = 0

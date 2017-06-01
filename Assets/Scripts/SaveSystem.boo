@@ -2,12 +2,14 @@ import UnityEngine
 import System.IO
 import System.Collections
 import System.BitConverter
+import UnityEngine.UI
 
 public class SaveSystem (MonoBehaviour): 
     
     public instrumentChanger as InstrumentChanger
     public musicScore as MusicScore
     public scaleChanger as ScaleChanger
+    public header as Text
     public instrumentStringParts as (string)
 
     private tex as Texture2D
@@ -142,6 +144,7 @@ public class SaveSystem (MonoBehaviour):
             fileData = File.ReadAllBytes(path)
             tex = Texture2D.blackTexture
             tex.LoadImage(fileData)//..this will auto-resize the texture dimensions.
+            header.text = path
 
             instrumentChanger.ClearAllInstruments()
 

@@ -10,6 +10,7 @@ public class TempoTapper (MonoBehaviour):
     public deltaTapTimes as (single)
 
     public tempoText as Text
+    public setBPM as SetBPM
 
     public i as int
 
@@ -37,3 +38,7 @@ public class TempoTapper (MonoBehaviour):
         tempo = Mathf.Round(60 /tempo)
 
         tempoText.text = tempo.ToString()
+
+
+    public def ApplyTempo():
+        setBPM.SetBPM(Mathf.RoundToInt(tempo))
