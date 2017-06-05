@@ -85,14 +85,8 @@ public class NoteSection (MonoBehaviour):
         outline.effectDistance = Vector2.one * 0.05f
         outline.effectColor = Color.grey
 
+
     def Update():
-        # if Input.GetKey(KeyCode.LeftControl) and Input.GetKeyDown(KeyCode.H):
-        #     if harmonyMode == false:
-        #         harmonyMode = true
-        #     else:
-        #         harmonyMode = false
-
-
         if startMouse != Vector2.zero and canMoveStuff:
             mouse.x = Input.mousePosition.x / Screen.width * 100
             mouse.y = Input.mousePosition.y / Screen.height * 100 /16 *9
@@ -105,47 +99,39 @@ public class NoteSection (MonoBehaviour):
                                             Time.fixedDeltaTime * 30f)
 
 
-        if playing:
-            currentTime += Time.fixedDeltaTime/musicScore.beatTime
-            if currentTime >= musicScore.beatTime:
-                currentTime = 0
-                y = 0
-                if delayLeft > 0:
-                    delayLeft--
-                else:
-                    while y < maxNotes:
-                        if notes[x,y] > 0f:
-                            if x > 0:
-                                if notes[x-1,y] == 0f:
-                                    PlayNote(y, notes[x,y])
-                            else:
-                                PlayNote(y, notes[x,y]) 
-                        if isRecording:
-                            if input[y] > 0f:
-                                //rounding cause lag
-                                # roundedX = Mathf.RoundToInt(x/musicScore.snap) * musicScore.snap
-                                # for i in range(musicScore.snap):
-                                #     SetNote(roundedX + i, y, input[y])
-                                SetNote(x, y, input[y])
-                        if notes[x,y] == 0f and x > 0 and notes[x-1,y] > 0f:
-                            StopPlayingNote(y)
-                        y++
-                    x++
-
-                    if loopsLeft >= 1f:
-                        if x >= sectionLength:
-                            x = 0
-                            y = 0
-                            loopsLeft -= 1f
-                            if loopsLeft <= 0f:
-                                Stop()
+    def NextTimeStep():
+        if delayLeft > 0:
+            delayLeft--
+        else:
+            for y in range(maxNotes):
+                if notes[x,y] > 0f:
+                    if x > 0:
+                        if notes[x-1,y] == 0f:
+                            PlayNote(y, notes[x,y])
                     else:
-                        if x >= sectionLength * loopsLeft:
-                            Stop()
-                    
+                        PlayNote(y, notes[x,y]) 
+                if isRecording:
+                    if input[y] > 0f:
+                        print(input[y])
+                        SetNote(x, y, input[y])
+                if notes[x,y] == 0f and x > 0 and notes[x-1,y] > 0f:
+                    StopPlayingNote(y)
+            
+            x++
 
+            if loopsLeft >= 1f:
+                if x >= sectionLength:
+                    x = 0
+                    y = 0
+                    loopsLeft -= 1f
+                    if loopsLeft <= 0f:
+                        Stop()
+            else:
+                if x >= sectionLength * loopsLeft:
+                    Stop()
+            
 
-                indicator.localPosition.x = ((loops - loopsLeft) * sectionLength) + x
+        indicator.localPosition.x = ((loops - loopsLeft) * sectionLength) + x
 
 
     def Play():
@@ -166,20 +152,28 @@ public class NoteSection (MonoBehaviour):
         stopButton.SetActive(true)
         playButton.SetActive(false)
         playing = true
+        print("play")
+        InvokeRepeating("NextTimeStep", 0, musicScore.beatTime)
+
 
     def Stop():
-        x = currentPositionOnTimeline
-        y = 0
+        try:
+            CancelInvoke()
+            x = currentPositionOnTimeline
+            y = 0
 
-        playing = false
-        stopButton.SetActive(false)
-        playButton.SetActive(true)
+            playing = false
+            stopButton.SetActive(false)
+            playButton.SetActive(true)
 
-        for i in range(128):
-            StopPlayingNote(i)
+            for i in range(128):
+                StopPlayingNote(i)
+        except:
+            pass //destroyed
+        
 
 
-    public def SetNote(x as int, y as int, z as single):
+    def SetNote(x as int, y as int, z as single):
         # print("creating note"+" / "+x+" / "+y+" / "+z)
         if x >= 0 and y >= 0 and x <= sectionLength and y <= maxNotes:
             notes[x,y] = z
@@ -197,11 +191,11 @@ public class NoteSection (MonoBehaviour):
                 if Mathf.RoundToInt(instNotePos.x) == x and Mathf.RoundToInt(instNotePos.y) == y:
                     Destroy(canvasButton.GetChild(i).gameObject)
 
-    public def StartNote(y as int, z as single):
+    def StartNote(y as int, z as single):
         # print("start note: " + y + "/" + z)
         input[y] = z
 
-    public def StopNote(y as int):
+    def StopNote(y as int):
         tempY = 0
         tempX = 0
         for tempY in range(maxNotes):
@@ -221,7 +215,7 @@ public class NoteSection (MonoBehaviour):
 
         input[y] = 0
 
-    public def PlayNote(y as int, z as single):
+    def PlayNote(y as int, z as single):
         # if harmonyMode == true:
         #     # for i in range(128):
         #     #     StopPlayingNote(i)
@@ -241,17 +235,17 @@ public class NoteSection (MonoBehaviour):
             y = scaleChanger.NoteOffset(y, false)
         instrument.PlayNote(y, z)        
 
-    public def StopPlayingNote(y as int):
+    def StopPlayingNote(y as int):
         if not instrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
         instrument.StopPlayingNote(y)
 
-    public def UpdateInstrument(newInstrument as Instrument):
+    def UpdateInstrument(newInstrument as Instrument):
         instrument = newInstrument
         //set name
         transform.GetComponent(Image).color = instrument.instrumentColor
 
-    public def SetLength(length as int): 
+    def SetLength(length as int): 
         notes = matrix(single, length, maxNotes)
         sectionLength = length
         noteSectionRectTransform.sizeDelta.x = length /8f
@@ -264,11 +258,11 @@ public class NoteSection (MonoBehaviour):
 
         # canvasBgMat.mainTextureScale = Vector2(length, maxNotes)
 
-    public def CalculateLoops():
+    def CalculateLoops():
         loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
 
 
-    public def AddLength(length as int, direciton as Vector2):
+    def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
         length *= 8
         canvasButton.sizeDelta.x += length
@@ -355,12 +349,7 @@ public class NoteSection (MonoBehaviour):
                 Destroy(noteBox.gameObject)
 
 
-
-
-    public def SetBPM(newBPM as int):
-        BPM = newBPM
-
-    public def CreateTempoMarker(x as int, newTempo as int):
+    def CreateTempoMarker(x as int, newTempo as int):
         timeline.sizeDelta.x = sectionLength
         # tempoMarkersMat.mainTextureScale.x = sectionLength
 
@@ -368,7 +357,7 @@ public class NoteSection (MonoBehaviour):
         # newTempoMarker.transform.SetParent(timeline, false)
         # newTempoMarker.transform.localPosition.x = x
 
-    public def ZoomIn():
+    def ZoomIn():
         canMoveStuff = false
         originalPosition = transform.parent.GetComponent(RectTransform).anchoredPosition
         transform.parent.GetComponent(RectTransform).anchoredPosition = Vector2(-noteSectionRectTransform.anchoredPosition.x +4, -noteSectionRectTransform.anchoredPosition.y +4)
@@ -385,7 +374,7 @@ public class NoteSection (MonoBehaviour):
         outline.effectDistance = Vector2.one * 0.05f
         outline.effectColor = Color.grey
 
-    public def ZoomOut():
+    def ZoomOut():
         canMoveStuff = true
         transform.parent.GetComponent(RectTransform).anchoredPosition = originalPosition
         transform.localScale = Vector3.one
@@ -402,7 +391,7 @@ public class NoteSection (MonoBehaviour):
 
 
 
-    public def Select():
+    def Select():
         if Input.GetKey(KeyCode.LeftShift) == false:
             musicScore.DeselectAll()
             musicScore.currentNoteSection = self
@@ -417,16 +406,16 @@ public class NoteSection (MonoBehaviour):
             ZoomIn()
         lastTimeClicked = Time.time
 
-    public def Deselect():
+    def Deselect():
         outline.effectDistance = Vector2.zero
         # outline.effectColor = instrument.instrumentColor
 
-    public def BeginDrag():
+    def BeginDrag():
         # print("begin drag")
         startMouse = Vector2(Input.mousePosition.x / Screen.width * 100, Input.mousePosition.y / Screen.height * 100 /16 *9)
         startPosition = transform.localPosition
 
-    public def EndDrag():
+    def EndDrag():
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
         transform.localPosition = musicScore.FindAvailableSpace(self, 
                                 desirablePosition.x, 
@@ -434,7 +423,7 @@ public class NoteSection (MonoBehaviour):
                                 noteSectionRectTransform.sizeDelta.x)
         startMouse = Vector2.zero
 
-    public def NumberOfNotes() as int:
+    def NumberOfNotes() as int:
         i as int = 0
         for n in notes:
             if n > 0:
@@ -442,7 +431,7 @@ public class NoteSection (MonoBehaviour):
         return i
 
 
-    public def Quantize(snap as int):
+    def Quantize(snap as int):
         for y in range(maxNotes):
             for x in range(1, notes.GetLength(0), 1):
                 if notes[x,y] > 0 and notes[x-1,y] == 0:
@@ -457,3 +446,32 @@ public class NoteSection (MonoBehaviour):
                     elif closestRoundedX > x:
                         for i in range(closestRoundedX-x):
                             SetNote(x+i, y, 0f)
+
+
+    def Transpose(distance as int):
+        //this might overwrite notes :s
+        for y in range(maxNotes):
+            for x in range(0, notes.GetLength(0)):
+                if notes[x,y] > 0:
+                    SetNote(x, y+distance, notes[x,y])
+                    SetNote(x, y, 0)
+
+    def TransposeOctave(distance as int):
+        //this might overwrite notes :s
+        scaleLength = Amvol.Amvol.scaleChanger.scaleLength
+        copy = matrix(single, notes.GetLength(0), maxNotes)
+
+        for y in range(maxNotes):
+            for x in range(0, notes.GetLength(0)):
+                try:
+                    copy[x, y + (scaleLength * distance)] = notes[x,y]
+                except:
+                    pass //out of range        
+
+                SetNote(x, y, 0)
+
+        for y in range(maxNotes):
+            for x in range(0, notes.GetLength(0)):
+
+                if copy[x,y] > 0:
+                    SetNote(x, y + (scaleLength * distance), notes[x,y])

@@ -1,7 +1,6 @@
 import UnityEngine
 import System.IO
 import System.Collections
-import System.BitConverter
 import UnityEngine.UI
 
 public class SaveSystem (MonoBehaviour): 

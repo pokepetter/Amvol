@@ -12,15 +12,7 @@ class ScaleChanger (MonoBehaviour):
     
     public scaleOffset as int = 0
     public noteOffset as int = 0
-    private i as int
-
-    # def Start():
-        # SetScale("21212121")
-        # SetScale("2212221")
-        // 024579 11 
-        // 012345 6
-        // 012234 5
-        # SetScale("02232")
+    
      
     def SetScaleOffset(offset as single):
         scaleOffset = offset

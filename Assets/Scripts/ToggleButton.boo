@@ -25,7 +25,7 @@ class ToggleButton (MonoBehaviour):
             StartCoroutine(ScaleRoutine(Vector2.one))
             if blockInput:
                 keyboardPlayer.blockInput = true
-        elif gameObject.active:
+        elif gameObject.activeSelf:
             StartCoroutine(ScaleRoutine(Vector2.zero))
             if blockInput:
                 keyboardPlayer.blockInput = false

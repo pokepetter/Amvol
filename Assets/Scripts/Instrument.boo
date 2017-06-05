@@ -1,6 +1,5 @@
 import UnityEngine
 import System.Collections
-import UnityEngine.Audio
 
 class Instrument (MonoBehaviour): 
 

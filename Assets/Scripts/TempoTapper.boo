@@ -26,19 +26,22 @@ public class TempoTapper (MonoBehaviour):
             tempTime = Time.fixedTime
             started = true
         else:
-            if i >= 4:
-                i = 0
+            print(i)
             deltaTapTimes[i] = Time.fixedTime - tempTime
             tempTime = Time.fixedTime
     
             i++
 
+            if i >= 4:
+                i = 0
+
+
         tempo = deltaTapTimes[0] + deltaTapTimes[1] + deltaTapTimes[2] + deltaTapTimes[3]
         tempo /= 4
-        tempo = Mathf.Round(60 /tempo)
+        tempo = 60f /tempo
 
         tempoText.text = tempo.ToString()
 
 
     public def ApplyTempo():
-        setBPM.SetBPM(Mathf.RoundToInt(tempo))
+        setBPM.SetBPM(tempo)

@@ -100,10 +100,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             Record()
 
         if Input.GetKeyDown(KeyCode.Space):
-            if recording:
-                Record()
-            else:
-                Play()
+            # if recording:
+            #     Record()
+            # else:
+            Play()
 
         if Input.GetKeyDown(KeyCode.Delete):
             DeleteSelectedNoteSections()
@@ -133,73 +133,69 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             if k >= 128:
                 k = 0
 
-        if playing:
-            currentTime += Time.fixedDeltaTime/beatTime
-            if currentTime >= beatTime:
-                currentTime = 0
-                y = 0
-                x++
-                if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
-                    canvasButton.localPosition.x -= 0.125f * canvasButton.localScale.x
+    def NextTimeStep():
+        x++
+        if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
+            canvasButton.localPosition.x -= 0.125f * canvasButton.localScale.x
 
-                if recording and newNoteSection != null:
-                    newNoteSection.sizeDelta.x += 0.125f
+        if recording and newNoteSection != null:
+            newNoteSection.sizeDelta.x += 0.125f
 
-            timeIndicator.localPosition.x = x * 0.125f
-            # currentTimeText.text = x.ToString()
+        timeIndicator.localPosition.x = x * 0.125f
+        # currentTimeText.text = x.ToString()
 
     def Record(newGetTempoBeforeRecording as bool):
         getTempoBeforeRecording = newGetTempoBeforeRecording
         Record()
 
 
-    def Record():
+    def ToggleRecord():
         if not recording:
-            if getTempoBeforeRecording:
-                beatInputsLeft = 5
-                waitForTempoInput = true
-            else:
-                recording = true
-                recordingActiveButton.SetActive(true)
-                Play()
-                //find open space for the note section
-                openPosition = cursor.transform.localPosition
-                for nS in noteSections:
-                    if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y) 
-                    and Mathf.RoundToInt(openPosition.x) < Mathf.RoundToInt(nS.transform.localPosition.x + nS.GetComponent(RectTransform).sizeDelta.x)
-                    ):
-                        openPosition.y += 4f
-
-                currentNoteSection = CreateNoteSection(openPosition, 0)
-                currentNoteSection.SetLength(projectLength*8)
-                currentNoteSection.playing = true
-                currentNoteSection.isRecording = true
-                newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
-                newNoteSection.sizeDelta.x = 0
-            
+            Record()
         else:
-            recording = false
-            recordingActiveButton.SetActive(false)
-            Stop()
-            currentNoteSection.playing = false
-            currentNoteSection.isRecording = false
-            if currentNoteSection.NumberOfNotes() == 0:
-                noteSections.Remove(currentNoteSection)
-                Destroy(currentNoteSection.gameObject)
-                currentNoteSection = null
-            else:
-                //trim empty space at the end, not used in the recording
-                currentRect = currentNoteSection.GetComponent(RectTransform)
-                currentRect.sizeDelta.x = Mathf.CeilToInt(currentRect.sizeDelta.x)
-                recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
-                currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
-                currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
+            StopRecording()
 
+    def Record():
+        if getTempoBeforeRecording:
+            beatInputsLeft = 5
+            waitForTempoInput = true
+        else:
+            recording = true
+            recordingActiveButton.SetActive(true)
+            //find open space for the note section
+            openPosition = cursor.transform.localPosition
+            for nS in noteSections:
+                if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y) 
+                and Mathf.RoundToInt(openPosition.x) < Mathf.RoundToInt(nS.transform.localPosition.x + nS.GetComponent(RectTransform).sizeDelta.x)
+                ):
+                    openPosition.y += 4f
 
+            currentNoteSection = CreateNoteSection(openPosition, 0)
+            currentNoteSection.SetLength(projectLength*8)
+            # currentNoteSection.Play()
+            currentNoteSection.isRecording = true
+            newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
+            newNoteSection.sizeDelta.x = 0
+            Play()
+            
+    def StopRecording():
+        recordingActiveButton.SetActive(false)
+        currentNoteSection.Stop()
+        currentNoteSection.isRecording = false
+        if currentNoteSection.NumberOfNotes() > 0:
+            //trim empty space at the end, not used in the recording
+            currentRect = currentNoteSection.GetComponent(RectTransform)
+            currentRect.sizeDelta.x = Mathf.CeilToInt(currentRect.sizeDelta.x)
+            recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
+            currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
+            currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
+
+        Stop()
 
     def Play():
         if not playing:
             playing = true
+            InvokeRepeating("NextTimeStep", 0, beatTime)
             originalCanvasButtonX = canvasButton.localPosition.x
             pauseButton.SetActive(true)
             originalPosition = x
@@ -216,39 +212,43 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                     
             metronomeNoteSection.Play()
         else:
-            for noteSection in noteSections:
-                noteSection.Stop()
-            metronomeNoteSection.Stop()
-            canvasButton.localPosition.x = originalCanvasButtonX
-            x = originalPosition
-            pauseButton.SetActive(false)
-            timeIndicator.localPosition.x = x * 0.125f
-            # currentTimeText.text = x.ToString()
-            y = 0
-            playing = false
-            if recording:
-                recording = false
-                currentNoteSection.playing = false
-                currentNoteSection.isRecording = false
-                if currentNoteSection.NumberOfNotes() == 0:
-                    Destroy(currentNoteSection.gameObject)
-                    currentNoteSection = null
+            Stop()
+            
 
     def Pause():
         if playing:
+            Stop()
             originalPosition = x
-            Play()
+            timeIndicator.localPosition.x = x * 0.125f
 
     def Stop():
-        if playing:
-            Play()
+        CancelInvoke()
+        playing = false
         x = 0
         timeIndicator.localPosition.x = 0
         recordingActiveButton.SetActive(false)
 
+        if recording:
+            recording = false
+            currentNoteSection.playing = false
+            currentNoteSection.isRecording = false
+            if currentNoteSection.NumberOfNotes() == 0:
+                noteSections.Remove(currentNoteSection)
+                Destroy(currentNoteSection.gameObject)
+                currentNoteSection = null
+
+        for noteSection in noteSections:
+            noteSection.Stop()
+        metronomeNoteSection.Stop()
+        canvasButton.localPosition.x = originalCanvasButtonX
+        pauseButton.SetActive(false)
+        timeIndicator.localPosition.x = x * 0.125f
+        # currentTimeText.text = x.ToString()
+        
+
     public def SetBPM(newBPM as int):
-        beatTime = 7.5f / newBPM
-        print("set BPM to " + newBPM)
+        beatTime = 1.875f / newBPM
+        print("set BPM to " + newBPM + ", beatTime: " + 1.875f / newBPM)
 
     public def CreateTempoMarker(x as int, newTempo as int):
         timeline.sizeDelta.x = projectLength
@@ -259,8 +259,6 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         # newTempoMarker.transform.localPosition.x = x
 
     public def OnPointerDown(ped as PointerEventData):
-        i as int = 0
-
         if RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent(RectTransform), ped.position, ped.pressEventCamera, localCursorPosition) and Input.GetKey(KeyCode.LeftAlt) == false:
             localCursorPosition = Vector2(Mathf.Round(localCursorPosition.x /1) *1, Mathf.FloorToInt(localCursorPosition.y /4) *4)
 

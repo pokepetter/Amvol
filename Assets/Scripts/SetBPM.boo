@@ -6,8 +6,11 @@ public class SetBPM (MonoBehaviour):
     public musicScore as MusicScore
     public inputFieldText as Text
 
-    def SetBPM():
-    	SetBPM(int.Parse(inputFieldText.text))
+    def Awake():
+    	SetBPM(60f)
 
-    def SetBPM(newBPM as int):
+    def SetBPM():
+    	SetBPM(single.Parse(inputFieldText.text))
+
+    def SetBPM(newBPM as single):
         musicScore.SetBPM(newBPM)

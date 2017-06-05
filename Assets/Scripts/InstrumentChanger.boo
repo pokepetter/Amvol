@@ -21,7 +21,6 @@ class InstrumentChanger (MonoBehaviour):
 
     def Initialize():
         keys = (KeyCode.Keypad0, KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3, KeyCode.Keypad4, KeyCode.Keypad5, KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9) 
-        currentInstruments = array(Instrument, 1)
         instruments = List of Instrument()
         AddInstrumentFromButton()
 
@@ -73,40 +72,22 @@ class InstrumentChanger (MonoBehaviour):
         targetInstrument.SetLerpSpeed(attack, falloff)
         targetInstrument.isDrumSet = isDrumSet
         targetInstrument.instrumentColor = color
-        i as int = 0
-        # print(audioClips.Count + " / " + startNotes.Count)
         targetInstrument.SetAudioClips(array(AudioClip, audioClips), array(int, startNotes))  
 
 
-    public def PlayNote(y as int, z as single):
+    def PlayNote(y as int, z as single):
         if not currentInstrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
         currentInstrument.PlayNote(y, z)
 
-    public def PlayInstrument(x as int, y as int, z as single):
-        # if harmonyMode == true:
-        #     # for i in range(128):
-        #     #     StopPlayingNote(i)
-        #     n = scaleChanger.NoteOffset(Random.Range(y, y), false)
-        #     instrumentChanger.instruments[x].PlayNote(n, z)
-        #     r as int = Random.Range(0, 1)
-        #     n = scaleChanger.NoteOffset(y+2 + r, false)
-        #     instrumentChanger.instruments[x].PlayNote(n, z)
-        #     if y > 36:
-        #         r = Random.Range(0, 2)
-        #         n = scaleChanger.NoteOffset(y+4 + r, false)
-        #         instrumentChanger.instruments[x].PlayNote(n, z)
 
-        # else:
-        y = scaleChanger.NoteOffset(y, false)
-        
-
-    public def StopPlayingNote(y as int):
+    def StopPlayingNote(y as int):
         if not currentInstrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
         currentInstrument.StopPlayingNote(y)
 
-    public def ClearAllInstruments():
+
+    def ClearAllInstruments():
         if instruments != null:
             instruments.Clear()
         currentInstrument = null

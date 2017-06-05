@@ -47,7 +47,7 @@ class InstrumentList (MonoBehaviour):
     public def ShowFolderContent(instrumentDirectory as string):
         currentDirectory = System.IO.Directory.GetCurrentDirectory()
         instrumentDirectory = Path.Combine(currentDirectory, instrumentDirectory)
-        folders = Directory.GetDirectories(instrumentDirectory)
+        # folders = Directory.GetDirectories(instrumentDirectory)
         files = Directory.GetFileSystemEntries(instrumentDirectory, "*.wav")
         # content.sizeDelta.y = files.Length
         # scrollView.sizeDelta.y = files.Length

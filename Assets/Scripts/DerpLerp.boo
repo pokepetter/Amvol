@@ -26,7 +26,7 @@ public class DerpLerp (MonoBehaviour):
             # p as single = 0.3f
             # t =  1 + 1 * Mathf.Pow(2f, -10f * t) * Mathf.Sin((t) * (2f * Mathf.PI) / p)
 
-            overshoot as single = 1.25f
+            # overshoot as single = 1.25f
             transform.localScale = Vector3.Lerp(startValue, targetValue * 1.1f , t - 0.1f)
         transform.localScale = targetValue
 

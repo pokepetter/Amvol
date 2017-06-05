@@ -37,7 +37,6 @@ class KeyboardPlayer (MonoBehaviour):
     def Start():
         musicScore = Amvol.GetMusicScore()
         instrumentChanger = Amvol.GetInstrumentChanger()
-        scaleChanger = Amvol.GetScaleChanger()
         UpdateNoteNames()
         
     def Update():
