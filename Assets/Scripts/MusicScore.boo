@@ -100,10 +100,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             Record()
 
         if Input.GetKeyDown(KeyCode.Space):
-            # if recording:
-            #     Record()
-            # else:
-            Play()
+            if recording:
+                StopRecording()
+            else:
+                Play()
 
         if Input.GetKeyDown(KeyCode.Delete):
             DeleteSelectedNoteSections()

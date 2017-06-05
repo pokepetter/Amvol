@@ -112,7 +112,6 @@ public class NoteSection (MonoBehaviour):
                         PlayNote(y, notes[x,y]) 
                 if isRecording:
                     if input[y] > 0f:
-                        print(input[y])
                         SetNote(x, y, input[y])
                 if notes[x,y] == 0f and x > 0 and notes[x-1,y] > 0f:
                     StopPlayingNote(y)
@@ -250,13 +249,7 @@ public class NoteSection (MonoBehaviour):
         sectionLength = length
         noteSectionRectTransform.sizeDelta.x = length /8f
         canvasButton.sizeDelta.x = sectionLength
-        # canvas.sizeDelta.x = length
-        # canvasButton.sizeDelta = Vector2(length, maxNotes)
-        # timeline.sizeDelta.x = length
 
-        # pianoRoll.sizeDelta = Vector2(length, maxNotes)
-
-        # canvasBgMat.mainTextureScale = Vector2(length, maxNotes)
 
     def CalculateLoops():
         loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
@@ -334,7 +327,7 @@ public class NoteSection (MonoBehaviour):
         print("Added to length: " + length + ". New length is: " + notes.GetLength(0))
 
     def TruncateEnd(length as int):
-        print("cut note section")
+        # print("cut note section")
         sectionLength = notes.GetLength(0) + length
         newNotes = matrix(single, sectionLength, maxNotes)
 
@@ -449,29 +442,18 @@ public class NoteSection (MonoBehaviour):
 
 
     def Transpose(distance as int):
-        //this might overwrite notes :s
+        copy as (single, 2) = notes.Clone()
+
         for y in range(maxNotes):
-            for x in range(0, notes.GetLength(0)):
-                if notes[x,y] > 0:
-                    SetNote(x, y+distance, notes[x,y])
-                    SetNote(x, y, 0)
+            for x in range(notes.GetLength(0)):
+                if notes[x,y] > 0f:
+                    SetNote(x, y, 0f)
+
+        for y in range(maxNotes):
+            for x in range(notes.GetLength(0)):
+                if copy[x,y] > 0f:
+                    SetNote(x, y + (distance), copy[x,y])
 
     def TransposeOctave(distance as int):
-        //this might overwrite notes :s
         scaleLength = Amvol.Amvol.scaleChanger.scaleLength
-        copy = matrix(single, notes.GetLength(0), maxNotes)
-
-        for y in range(maxNotes):
-            for x in range(0, notes.GetLength(0)):
-                try:
-                    copy[x, y + (scaleLength * distance)] = notes[x,y]
-                except:
-                    pass //out of range        
-
-                SetNote(x, y, 0)
-
-        for y in range(maxNotes):
-            for x in range(0, notes.GetLength(0)):
-
-                if copy[x,y] > 0:
-                    SetNote(x, y + (scaleLength * distance), notes[x,y])
+        Transpose(distance * scaleLength)
