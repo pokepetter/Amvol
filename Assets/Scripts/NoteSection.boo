@@ -151,7 +151,6 @@ public class NoteSection (MonoBehaviour):
         stopButton.SetActive(true)
         playButton.SetActive(false)
         playing = true
-        print("play")
         InvokeRepeating("NextTimeStep", 0, musicScore.beatTime)
 
 
