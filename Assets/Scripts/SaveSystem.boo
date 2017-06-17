@@ -20,7 +20,14 @@ public class SaveSystem (MonoBehaviour):
 
 
     def Awake():
-        Load(Environment.GetCommandLineArgs()[0])
+        args = Environment.GetCommandLineArgs()
+        for a in args:
+            print(a)
+        if args.Length > 0:
+          try:
+              Load(Environment.GetCommandLineArgs()[1])
+          except:
+              pass
 
     public def Save(saveName as string):
         tex = Texture2D.blackTexture
@@ -149,7 +156,7 @@ public class SaveSystem (MonoBehaviour):
 
             instrumentString = Encoding.UTF8.GetString(fileData)
             instrumentStringParts = Regex.Split(instrumentString, "Instruments: ")
-            if instrumentStringParts.Length > 0:
+            if instrumentStringParts.Length >= 1:
                 instrumentString = instrumentStringParts[1]
             instrumentStringParts = Regex.Split(instrumentString, ", ")
 

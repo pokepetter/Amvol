@@ -2,12 +2,15 @@ import UnityEngine
 import UnityEngine.UI
 import System.IO
 
+
 public class FileBrowser (MonoBehaviour): 
     
     public drives as (string)
     public folders as (string)
     public files as (string)
     public allFiles as (string)
+
+    public defaultDirectory as string
 
     public currentDirectory as string
     public parentDirectory as string
@@ -26,20 +29,33 @@ public class FileBrowser (MonoBehaviour):
 
     def Awake():
         drives = System.IO.Directory.GetLogicalDrives()
-        currentDirectory = System.IO.Directory.GetCurrentDirectory()
+
+        configFilePath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "config.txt")
+
+        try:
+            line as string
+            file as StreamReader = StreamReader(configFilePath, Encoding.Default)
+            
+            while (line = file.ReadLine()) != null:
+                words as (string) = line.Split(char.Parse(" "))
+                for i in range(words.Length):
+                    if words[i] == "project_folder:":
+                        if System.IO.Directory.Exists(words[i+1]):
+                            defaultDirectory = words[i+1]
+            file.Close()
+        except:
+            defaultDirectory = System.IO.Directory.GetCurrentDirectory()
+
+        transform.localPosition = Vector3.zero
+        gameObject.SetActive(false)
+
+
+    def OnEnable():
+        currentDirectory = defaultDirectory
         parentDirectory = System.IO.Directory.GetParent(currentDirectory).FullName
         allFiles = System.IO.Directory.GetFileSystemEntries(currentDirectory)
-        transform.localPosition = Vector3.zero
+        UpdateFileList(".png")
 
-
-
-    public def ShowFileBrowser(visible as bool):
-        # loadMenuWindow.gameObject.SetActive(visible)
-        if visible == true:
-            UpdateFileList(".wav")
-            targetScale = Vector3.one
-        else:
-            targetScale = Vector3.zero
 
 
     public def UpdateFileList(fileType as string):
@@ -81,6 +97,9 @@ public class FileBrowser (MonoBehaviour):
             if currentDirectory.Length+1 < files[i].Length:
                 clone.GetChild(0).GetComponent(Text).text = files[i].Remove(0, currentDirectory.Length+1)
             i++
+
+        content.localPosition.y = 0
+        
 
     public def SelectFile(fileName as string):
         currentDirectory = fileName

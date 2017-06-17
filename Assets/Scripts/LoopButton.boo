@@ -20,15 +20,14 @@ class LoopButton (MonoBehaviour):
         startMouseX = mouseX
         originalWidth = noteSectionRectTransform.sizeDelta.x
 
+
     public def EndDrag():
         # print("end drag")
         startMouseX = 0
         originalWidth = noteSectionRectTransform.sizeDelta.x
         noteSection.CalculateLoops()
-        rectTransform.localPosition.x = originalWidth
+        rectTransform.anchoredPosition.x = 0
 
-        # noteSectionRectTransform.sizeDelta.x += deltaMouseX
-        # noteSection.loops = 3
 
     public def Update():
         mouseX = Input.mousePosition.x / Screen.width * 100

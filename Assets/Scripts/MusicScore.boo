@@ -287,7 +287,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         noteSectionObject.transform.GetComponent(RectTransform).sizeDelta.x = startLength
         noteSection = noteSectionObject.GetComponent(NoteSection)
         noteSection.SetLength(startLength)
-        noteSection.loopButtonRight.localPosition.x = noteSection.noteSectionRectTransform.sizeDelta.x
+        noteSection.loopButtonRight.anchoredPosition.x = 0
         noteSections.Add(noteSection)
         currentNoteSection = noteSection
         noteSection.Select()

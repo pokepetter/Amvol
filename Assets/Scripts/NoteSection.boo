@@ -59,6 +59,7 @@ public class NoteSection (MonoBehaviour):
     public canvasGrid as Image
     public canvasButtonButton as Button
     public handles as GameObject
+    public loopGrid as GridRenderer
     public zoomOutButton as GameObject
     public playButton as GameObject
     public stopButton as GameObject
@@ -248,11 +249,13 @@ public class NoteSection (MonoBehaviour):
         sectionLength = length
         noteSectionRectTransform.sizeDelta.x = length /8f
         canvasButton.sizeDelta.x = sectionLength
+        CalculateLoops()
 
 
     def CalculateLoops():
         loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
-
+        loopGrid.spacingX = sectionLength /8
+        loopGrid.DrawGrid()
 
     def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
@@ -271,9 +274,9 @@ public class NoteSection (MonoBehaviour):
 
                 guiLength = newLength /8
                 resizeButtonRight.anchoredPosition.x = guiLength
-                if noteSectionRectTransform.sizeDelta.x < guiLength:
+                if noteSectionRectTransform.sizeDelta.x <= guiLength:
                     noteSectionRectTransform.sizeDelta.x = guiLength
-                    loopButtonRight.localPosition.x = guiLength
+                    loopButtonRight.anchoredPosition.x = 0
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -339,6 +342,8 @@ public class NoteSection (MonoBehaviour):
         for noteBox in canvasButton.GetComponentsInChildren[of RectTransform]():
             if noteBox.anchoredPosition.x > sectionLength and noteBox != indicator:
                 Destroy(noteBox.gameObject)
+
+        CalculateLoops()
 
 
     def CreateTempoMarker(x as int, newTempo as int):
