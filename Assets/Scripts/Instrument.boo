@@ -73,14 +73,14 @@ class Instrument (MonoBehaviour):
         aS = clone.AddComponent(AudioSource)
 
         //find closest audioclip
-        distanceUp as int = 0
+        distanceUp = 0
         while y + distanceUp < audioClips.Length:
             if audioClips[y + distanceUp] == null:
                 distanceUp++
             else:
                 break
 
-        distanceDown as int = 0
+        distanceDown = 0
         while y + distanceDown > 0:
             if audioClips[y + distanceDown] == null:
                 distanceDown--

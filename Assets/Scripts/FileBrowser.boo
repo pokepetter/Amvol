@@ -55,6 +55,10 @@ public class FileBrowser (MonoBehaviour):
         parentDirectory = System.IO.Directory.GetParent(currentDirectory).FullName
         allFiles = System.IO.Directory.GetFileSystemEntries(currentDirectory)
         UpdateFileList(".png")
+        Amvol.Amvol.keyboardPlayer.blockInput = true
+
+    def OnDisable():
+        Amvol.Amvol.keyboardPlayer.blockInput = false
 
 
 

@@ -16,4 +16,4 @@ class FileButton (MonoBehaviour):
 
     private def SelectFile() as callable:
         fileBrowser.SelectFile(fullPath)
-        fileBrowser.LoadFile()
+        # fileBrowser.LoadFile()

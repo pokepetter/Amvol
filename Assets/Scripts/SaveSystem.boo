@@ -29,7 +29,7 @@ public class SaveSystem (MonoBehaviour):
           except:
               pass
 
-    public def Save(saveName as string):
+    public def Save(filePath as string):
         tex = Texture2D.blackTexture
         
         //find document length
@@ -119,8 +119,18 @@ public class SaveSystem (MonoBehaviour):
 
         bytes = tex.EncodeToPNG()
         
-        print("saved to"+Application.dataPath + "/" + saveName)
-        # imageData = File.ReadAllBytes(Application.dataPath + "/" + saveName + ".png")
+        
+        instrumentInfo = "Instruments: "
+        for i in range(instrumentChanger.instruments.Count):
+            instrument = instrumentChanger.instruments[i]
+            instrumentInfo += instrument.gameObject.name
+            if i < instrumentChanger.instruments.Count -1:
+                instrumentInfo += ", "
+        instrumentBytes = Encoding.UTF8.GetBytes(instrumentInfo)
+
+        bytes += instrumentBytes
+
+        # imageData = File.ReadAllBytes(Application.dataPath + "/" + filePath + ".png")
 
         # firstPart = bytes.Take(29).ToArray()
         # lastPart = bytes.Skip(37).Take(bytes.Length-37).ToArray()
@@ -133,30 +143,24 @@ public class SaveSystem (MonoBehaviour):
         # middlePart = Encoding.UTF8.GetBytes(instrumentInfo)
         
         # bytes  = firstPart + middlePart + lastPart
-        instrumentInfo = "Instruments: "
-        for i in range(instrumentChanger.instruments.Count):
-            instrument = instrumentChanger.instruments[i]
-            instrumentInfo += instrument.gameObject.name
-            if i < instrumentChanger.instruments.Count -1:
-                instrumentInfo += ", "
-        instrumentBytes = Encoding.UTF8.GetBytes(instrumentInfo)
 
-        bytes += instrumentBytes
-
-        File.WriteAllBytes(Application.dataPath + "/" + saveName + ".png", bytes)
+        print("saved to " + filePath)
+        File.WriteAllBytes(filePath + ".png", bytes)
 
     public def Load(path as string):
+        print(path)
         if File.Exists(path):
             fileData = File.ReadAllBytes(path)
             tex = Texture2D.blackTexture
             tex.LoadImage(fileData)//..this will auto-resize the texture dimensions.
             header.text = path
 
+            musicScore.NewProject()
             instrumentChanger.ClearAllInstruments()
 
             instrumentString = Encoding.UTF8.GetString(fileData)
             instrumentStringParts = Regex.Split(instrumentString, "Instruments: ")
-            if instrumentStringParts.Length >= 1:
+            if instrumentStringParts.Length > 1:
                 instrumentString = instrumentStringParts[1]
             instrumentStringParts = Regex.Split(instrumentString, ", ")
 
@@ -349,21 +353,3 @@ public class SaveSystem (MonoBehaviour):
     #             cumNoteTime++
     #             noteCanvas.SetNote(cumNoteTime-1, bytes[i+1]-24, bytes[i+2] /100f)
 
-
-    public def Update():
-        if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.S):
-            Save("debugSave")
-
-        if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.L):
-            Load(Application.dataPath + "/debugSave.png")
-
-        # if Input.GetKey(KeyCode.LeftShift) and Input.GetKey(KeyCode.L):
-        #     try:
-        #         LoadMid("D:/Audiogen/Assets/liberty.mid")
-        #     except:
-        #         pass
-
-        #     try:
-        #         LoadMid("E:/Audiogen/Assets/liberty.mid")
-        #     except:
-        #         pass
