@@ -8,6 +8,7 @@ class Note (MonoBehaviour):
     public targetPitch as single
     public instrument as Instrument
     public noteNumber as int
+    public originalVolume as single
 
     private isStopping as bool
 

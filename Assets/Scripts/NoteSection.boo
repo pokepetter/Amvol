@@ -44,8 +44,10 @@ public class NoteSection (MonoBehaviour):
     public resizeButtonLeft as RectTransform
     public resizeButtonRight as RectTransform
     public loopButtonRight as RectTransform
+    public automation as EasyLineRenderer
     private maxNotes as int = 128
     private tempoMarkers as (int)
+    private connectedNotes as List of Note
 
     public outline as Outline
     public scrollRect as ScrollRect
@@ -74,6 +76,7 @@ public class NoteSection (MonoBehaviour):
         instrumentChanger = Amvol.GetInstrumentChanger()
         UpdateInstrument(instrumentChanger.currentInstrument)
         input = array(single, maxNotes)
+        connectedNotes = List of Note()
         transform.localScale = Vector3.zero
         DerpLerp.Scale(transform, Vector3.one, 0.2f)
         
@@ -100,6 +103,16 @@ public class NoteSection (MonoBehaviour):
                                             Time.fixedDeltaTime * 30f)
 
 
+        if Input.GetKeyDown(KeyCode.Tab):
+            handles.SetActive(false)
+            automation.gameObject.SetActive(true)
+
+        if Input.GetKeyUp(KeyCode.Tab):
+            if canMoveStuff:
+                handles.SetActive(true)
+            automation.gameObject.SetActive(false)
+
+
     def NextTimeStep():
         if delayLeft > 0:
             delayLeft--
@@ -109,8 +122,10 @@ public class NoteSection (MonoBehaviour):
                     if x > 0:
                         if notes[x-1,y] == 0f:
                             PlayNote(y, notes[x,y])
-                    else:
+                    else: //fist note
                         PlayNote(y, notes[x,y]) 
+
+
                 if isRecording:
                     if input[y] > 0f:
                         SetNote(x, y, input[y])
@@ -165,6 +180,7 @@ public class NoteSection (MonoBehaviour):
             stopButton.SetActive(false)
             playButton.SetActive(true)
 
+            connectedNotes.Clear()
             for i in range(128):
                 StopPlayingNote(i)
         except:
@@ -203,10 +219,10 @@ public class NoteSection (MonoBehaviour):
                     nextNoteX = tempX
                     nextNoteY = tempY
 
-        for i in range(256):
-            if notes[nextNoteX+i,nextNoteY] < 0.01f:
-                # print("nextNoteLength is: " + i)
-                break
+        # for i in range(256):
+        #     if notes[nextNoteX+i,nextNoteY] < 0.01f:
+        #         # print("nextNoteLength is: " + i)
+        #         break
 
         # noteLengthInTime = beatTime * nextNoteLength
         # instrument.attack = 
@@ -215,24 +231,16 @@ public class NoteSection (MonoBehaviour):
         input[y] = 0
 
     def PlayNote(y as int, z as single):
-        # if harmonyMode == true:
-        #     # for i in range(128):
-        #     #     StopPlayingNote(i)
-        #     n = scaleChanger.NoteOffset(Random.Range(y, y), false)
-        #     instrumentChanger.instruments[x].PlayNote(n, z)
-        #     r as int = Random.Range(0, 1)
-        #     n = scaleChanger.NoteOffset(y+2 + r, false)
-        #     instrumentChanger.instruments[x].PlayNote(n, z)
-        #     if y > 36:
-        #         r = Random.Range(0, 2)
-        #         n = scaleChanger.NoteOffset(y+4 + r, false)
-        #         instrumentChanger.instruments[x].PlayNote(n, z)
-
-        # else:
-
+        if isRecording:
+            z *= 0.5f
         if not instrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
-        instrument.PlayNote(y, z)        
+        note = instrument.PlayNote(y, z)
+        connectedNotes.Add(note)
+
+        if not isRecording:
+            for n in connectedNotes:
+                n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/8].y / noteSectionRectTransform.rect.height
 
     def StopPlayingNote(y as int):
         if not instrument.isDrumSet:
@@ -256,6 +264,13 @@ public class NoteSection (MonoBehaviour):
         loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
         loopGrid.spacingX = sectionLength /8
         loopGrid.DrawGrid()
+        if automation.lineRenderer.points.Length < noteSectionRectTransform.rect.width:
+            addedPoints = array(Vector2, noteSectionRectTransform.rect.width - automation.lineRenderer.points.Length)
+            for p in addedPoints:
+                p.y = automation.lineRenderer.points[automation.lineRenderer.points.Length-1].y
+            automation.lineRenderer.points += addedPoints
+        else:
+            automation.lineRenderer.points = automation.lineRenderer.points[noteSectionRectTransform.rect.width:]
 
     def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
@@ -277,6 +292,8 @@ public class NoteSection (MonoBehaviour):
                 if noteSectionRectTransform.sizeDelta.x <= guiLength:
                     noteSectionRectTransform.sizeDelta.x = guiLength
                     loopButtonRight.anchoredPosition.x = 0
+
+                automation.lineRenderer.points += array(Vector2, length/8)
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -365,6 +382,7 @@ public class NoteSection (MonoBehaviour):
         canvasButtonButton.enabled = true
         canvasButton.sizeDelta.x = sectionLength
         handles.SetActive(false)
+        loopGrid.gameObject.SetActive(false)
         scrollRect.enabled = true
         
         zoomOutButton.SetActive(true)
@@ -380,6 +398,7 @@ public class NoteSection (MonoBehaviour):
         canvasGrid.enabled = false
         canvasButtonButton.enabled = false
         handles.SetActive(true)
+        loopGrid.gameObject.SetActive(true)
         scrollRect.enabled = false
 
         zoomOutButton.SetActive(false)

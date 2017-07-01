@@ -189,6 +189,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
             currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
             currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
+            currentNoteSection.automation.DrawGrid()
 
         Stop()
 

@@ -67,7 +67,7 @@ class Instrument (MonoBehaviour):
             audioClips[notes[i]] = newAudioClips[i]
             # print(notes[i] +" / "+ newAudioClips[i].ToString())
 
-    def PlayNote(y as int, z as single):
+    def PlayNote(y as int, z as single) as Note:
         clone = GameObject(y.ToString())
         clone.transform.SetParent(noteParent, false)
         aS = clone.AddComponent(AudioSource)
@@ -122,6 +122,7 @@ class Instrument (MonoBehaviour):
         z *= z
         note.Play(z * volume * dynamicVolume)
         note.noteNumber = y
+        return note
 
     def StopPlayingNote(y as int):
         # if targetAudioSource.loop:
@@ -138,7 +139,7 @@ class Instrument (MonoBehaviour):
         dynamicVolume = newVolume
         audioLerpers = noteParent.GetComponentsInChildren[of AudioLerper]()
         for l in audioLerpers:
-            l.SetMultiplier(dynamicVolume)
+            l.instrumentMultiplier = dynamicVolume
             
     def SetPan(newPan as single):
         pan = newPan

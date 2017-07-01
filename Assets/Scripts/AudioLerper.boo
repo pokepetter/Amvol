@@ -5,7 +5,8 @@ class AudioLerper (MonoBehaviour):
     public audioSource as AudioSource
     public elapsedTime as single
     public t as single
-    public multiplier as single = 1f
+    public instrumentMultiplier as single = 1f
+    public noteSectionMultiplier as single = 0.5f
     public newVolume as single = 0f
 
 
@@ -30,7 +31,4 @@ class AudioLerper (MonoBehaviour):
         yield
 
     def Update():
-        audioSource.volume = newVolume * multiplier
-
-    def SetMultiplier(newMultiplier as single):
-        multiplier = newMultiplier
+        audioSource.volume = newVolume * instrumentMultiplier * noteSectionMultiplier

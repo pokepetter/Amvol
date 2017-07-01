@@ -19,7 +19,7 @@ public class FileBrowser (MonoBehaviour):
     public loadMenuWindow as Transform
     public loadMenuButton as GameObject
     public content as Transform
-    public fileNameField as Text
+    public fileNameField as InputField
     public directoryNameField as Text
     public folderPath as string
 
