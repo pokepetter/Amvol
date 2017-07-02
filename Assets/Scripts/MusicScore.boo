@@ -292,6 +292,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         noteSections.Add(noteSection)
         currentNoteSection = noteSection
         noteSection.Select()
+        noteSection.automation.DrawGrid()
         return noteSection.GetComponent(NoteSection)
 
     public def DeselectAll():

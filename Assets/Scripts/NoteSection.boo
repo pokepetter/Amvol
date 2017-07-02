@@ -84,6 +84,7 @@ public class NoteSection (MonoBehaviour):
         canvasButtonButton.enabled = false
         handles.SetActive(true)
         scrollRect.enabled = false
+        automation.gameObject.SetActive(false)
 
         zoomOutButton.SetActive(false)
         outline.effectDistance = Vector2.one * 0.05f

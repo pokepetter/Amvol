@@ -12,10 +12,9 @@ class EasyLineRenderer (MonoBehaviour, IDragHandler):
 
     public rectTransform as RectTransform
     public lineRenderer as UILineRenderer 
-    # private bool inside
 
-    def Start():
-        DrawGrid()
+    # def Awake():
+    #     DrawGrid()
 
 
     def DrawGrid():
@@ -28,9 +27,6 @@ class EasyLineRenderer (MonoBehaviour, IDragHandler):
         lineRenderer.enabled = false
         lineRenderer.enabled = true
 
-    # def OnPointerDown(ped as PointerEventData):
-    #     inside = true
-
 
     def OnDrag(ped as PointerEventData):
         # if inside:
@@ -42,5 +38,3 @@ class EasyLineRenderer (MonoBehaviour, IDragHandler):
             lineRenderer.points[localCursorPosition.x].y = localCursorPosition.y
             lineRenderer.enabled = false
             lineRenderer.enabled = true
-            # print(localCursorPosition)
-            # noteSection.SetNote(localCursorPosition.x +i, localCursorPosition.y, 1f)

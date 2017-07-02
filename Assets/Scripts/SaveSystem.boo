@@ -115,6 +115,15 @@ public class SaveSystem (MonoBehaviour):
                     y = 1
                     x++
 
+            //save volume automation
+            for i in range(noteSection.automation.lineRenderer.points.Length-1):
+                point = noteSection.automation.lineRenderer.points[i]
+                x = noteSection.transform.localPosition.x * 32 + (i * 8)
+                y = (noteSection.transform.localPosition.y * 32) + 3 + (point.y / noteSection.noteSectionRectTransform.rect.height * 127)
+                # print(y)
+
+                pixel = tex.GetPixel(x, y)
+                tex.SetPixel(x, y, pixel + Color(0, 1, 0))
 
 
         bytes = tex.EncodeToPNG()
@@ -148,6 +157,9 @@ public class SaveSystem (MonoBehaviour):
         File.WriteAllBytes(filePath + ".png", bytes)
 
     public def Load(path as string):
+        StartCoroutine(LoadRoutine(path))
+
+    public def LoadRoutine(path as string) as IEnumerator:
         print(path)
         if File.Exists(path):
             fileData = File.ReadAllBytes(path)
@@ -210,29 +222,47 @@ public class SaveSystem (MonoBehaviour):
             color = tex.GetPixel(x + scaleChanger.scaleLength + 2, 1)
             scaleChanger.noteOffset = color.r
 
-            for h in range(tex.height):
+            for h in range(2, tex.height, 128):
                 for w in range(tex.width):
                     //find note section start
                     if tex.GetPixel(w,h) == Color.green:
-                        # print("found note section start")
+                        print("found note section start")
                         startPosition = w
-                        i = startPosition
                         //find note section end
-                        while i <= tex.width:
-                            if tex.GetPixel(i,h) == Color.blue:
-                                # print("found note section end")
-                                noteSectionLength = i - startPosition +1
+                        for x in range(startPosition, tex.width):
+                            if tex.GetPixel(x,h) == Color.blue:
+                                print("found note section end")
+                                noteSectionLength = x - startPosition +1
                                 break
-                            i++ 
+
 
                         noteSection = musicScore.CreateNoteSection(Vector2(w /8, Mathf.FloorToInt((h-2)/32)), noteSectionLength)
                         instIndex as Color32 = tex.GetPixel(w+1, h)
                         print(instIndex.r)
                         noteSection.UpdateInstrument(instrumentChanger.instruments[instIndex.r])
+                        //find number of loops
+                        wholeLoops as Color32 = tex.GetPixel(startPosition+2, h)
+                        noteSection.loops = wholeLoops.g
+                        //partial loops
+                        noteSection.loops += tex.GetPixel(startPosition+3, h).g
 
                         for x in range(noteSectionLength):
                             for y in range(128):
-                                noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)                        
+                                noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)
+
+                        //volume automation
+                        # yield null
+                        yield WaitForSeconds(0.1f)
+                        lineHeight = Color32()
+                        for x in range(startPosition, startPosition + (noteSectionLength*noteSection.loops), 8):
+                            for y in range(h, 127+3):
+                                lineHeight = tex.GetPixel(x,y)
+                                if lineHeight.g > 0f:
+                                    # print((y-h) / 127f)
+                                    noteSection.automation.lineRenderer.points[x/8].y = (y-h) / 127f * noteSection.noteSectionRectTransform.rect.height
+                                    print(noteSection.automation.lineRenderer.points[x/8].y)
+                                    break
+
 
         else:
             print("file does not exist")
