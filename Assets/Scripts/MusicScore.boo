@@ -28,7 +28,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     public noteSections as List of NoteSection
     public metronomeNoteSection as NoteSection
 
-    private x as int //pos
+    public x as int //pos
     private y as int //note
     private z as single //volume and short/long
     

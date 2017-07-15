@@ -49,6 +49,7 @@ public class FileBrowser (MonoBehaviour):
         transform.localPosition = Vector3.zero
         gameObject.SetActive(false)
 
+        
 
     def OnEnable():
         currentDirectory = defaultDirectory
@@ -56,6 +57,13 @@ public class FileBrowser (MonoBehaviour):
         allFiles = System.IO.Directory.GetFileSystemEntries(currentDirectory)
         UpdateFileList(".png")
         Amvol.Amvol.keyboardPlayer.blockInput = true
+
+        //hacky
+        headerText = Amvol.Amvol.saveSystem.header.text
+        if headerText != 'Amvol':
+        	fileNameField.text = Path.GetFileName(headerText).Split(char.Parse('.'))[0]
+
+
 
     def OnDisable():
         Amvol.Amvol.keyboardPlayer.blockInput = false

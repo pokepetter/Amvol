@@ -8,7 +8,6 @@ class Synth (MonoBehaviour):
     public samplerate as single = 44100f
     public frequency as single= 440f
     public amplitude as single = 1f
-    public recorder as Record
     private i as int = 0
     private hasRecorded as bool
     private allDataSources as (single)

@@ -13,4 +13,7 @@ class SaveButton (MonoBehaviour):
         button.onClick.AddListener({Save()})
 
     private def Save() as callable:
-        Amvol.GetSaveSystem().Save(Path.Combine(folderField.text, inputField.text))
+        fileName = inputField.text
+        if not fileName.EndsWith(".png"):
+            fileName += ".png"
+        Amvol.GetSaveSystem().Save(Path.Combine(folderField.text, fileName))

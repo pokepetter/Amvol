@@ -108,7 +108,7 @@ public class SaveSystem (MonoBehaviour):
             tex.SetPixel(((noteSection.transform.localPosition.x * 8) + noteSection.transform.GetComponent(RectTransform).sizeDelta.x * 8) -1, (noteSection.transform.localPosition.y * 32) +2, Color.blue)
             
             //save notes
-            while y < 128 and x < noteSection.transform.GetComponent(RectTransform).sizeDelta.x * 8:
+            while y < 128 and x < noteSection.sectionLength:
                 tex.SetPixel((noteSection.transform.localPosition.x * 32) + x, (noteSection.transform.localPosition.y * 32) + y +2, Color(noteSection.notes[x,y], 0, 0))
                 y++
                 if y == 128:
@@ -154,7 +154,7 @@ public class SaveSystem (MonoBehaviour):
         # bytes  = firstPart + middlePart + lastPart
 
         print("saved to " + filePath)
-        File.WriteAllBytes(filePath + ".png", bytes)
+        File.WriteAllBytes(filePath, bytes)
 
     public def Load(path as string):
         StartCoroutine(LoadRoutine(path))
