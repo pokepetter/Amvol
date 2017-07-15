@@ -1,132 +1,42 @@
-﻿import UnityEngine
-import System
-import System.IO
+﻿import System.IO // for FileStream
+import System // for BitConverter and Byte Type
+import UnityEngine.UI
+ 
+public class WavWriter (MonoBehaviour):
 
-public class WavWriter(MonoBehaviour):
-    // constants for the wave file header
-    private static final HEADER_SIZE = 44
-    private static final BITS_PER_SAMPLE as short = 16
-    private static final SAMPLE_RATE = 44100
-    // the number of audio channels in the output file
-    private channels = 2
-    // the audio stream instance
-    private outputStream as MemoryStream
-    private outputWriter as BinaryWriter
-
+    private bufferSize  as int
+    private numBuffers as int
+    private outputRate as int = 44100
     public directoryField as Text
     public fileNameField as Text
     public metronomeInstrument as Instrument
+    private headerSize as int = 44 //default for uncompressed wav
      
     public mixingInProgress as GameObject
     public progressBar as RectTransform
-    # public recOutput as bool
+    public recOutput as bool
+    private data as (single)
+     
+    private fileStream as FileStream
+    private allDataSources as (single)
     private musicScore as MusicScore
     private width as single
-    
-    // should this object be rendering to the output stream?
-    public recOutput = false
-    public enum Status:
-        UNKNOWN
-        SUCCESS
-        FAIL
-        ASYNC
-    
-    # public class Result:
-    #     public State as Status
-    #     public Message as string
+     
+    // Audio Source
+    # private pausAudio as AudioSource
+     
+    def Awake():
+        AudioSettings.outputSampleRate = outputRate
+        data = array(single, 2 * outputRate)
+
         
-    #     public def constructor(newState as Status, newMessage as string):
-    #         self.State = newState
-    #         self.Message = newMessage
-
-
-    public def constructor():
-        self.Clear()
-
-    // reset the renderer
-    public def Clear():
-        self.outputStream = MemoryStream()
-        self.outputWriter = BinaryWriter(outputStream)
-    
-    public def Write(audioData as (single)):
-        for i in range(0, audioData.Length):
-        // Convert numeric audio data to bytes
-            // write the short to the stream
-            self.outputWriter.Write(((audioData[i] * (Int16.MaxValue cast single)) cast short))
-    
-    // write the incoming audio to the output string
-    private def OnAudioFilterRead(data as (single), channels as int):
-        if self.recOutput:
-            // store the number of channels we are rendering
-            self.channels = channels    
-            // store the data stream
-            self.Write(data)
-        
-
-    public def Save(filename as string):
-        # result as Result = WavWriter.Result()
-        if outputStream.Length > 0:
-            // add a header to the file so we can send it to the SoundPlayer
-            self.AddHeader()    
-            // if a filename was passed in
-            if filename.Length > 0:
-                // Save to a file. Print a warning if overwriting a file.
-                if File.Exists(filename):
-                    Debug.LogWarning((('Overwriting ' + filename) + '...'))     
-                // reset the stream pointer to the beginning of the stream
-                outputStream.Position = 0       
-                // write the stream to a file
-                fs as FileStream = File.OpenWrite(filename) 
-                self.outputStream.WriteTo(fs)   
-                fs.Close()  
-                // for debugging only
-                Debug.Log((('Finished saving to ' + filename) + '.'))
-                
-            # result.State = Status.SUCCESS
-        else:
-            Debug.LogWarning('There is no audio data to save!')
-            # result.State = Status.FAIL
-            # result.Message = 'There is no audio data to save!'
-        
-        # return result
-
-    
-    private def AddHeader():
-        // reset the output stream
-        outputStream.Position = 0
-        // calculate the number of samples in the data chunk
-        numberOfSamples as long = (outputStream.Length / (BITS_PER_SAMPLE / 8))
-        // create a new MemoryStream that will have both the audio data AND the header
-        newOutputStream = MemoryStream()
-        writer = BinaryWriter(newOutputStream)
-        writer.Write(1179011410)
-        // "RIFF" in ASCII
-        // write the number of bytes in the entire file
-        writer.Write((((HEADER_SIZE + (((numberOfSamples * BITS_PER_SAMPLE) * channels) / 8)) cast int) - 8))       
-        writer.Write(1163280727)
-        // "WAVE" in ASCII
-        writer.Write(544501094)
-        // "fmt " in ASCII
-        writer.Write(16)        
-        // write the format tag. 1 = PCM
-        writer.Write((1 cast short))        
-        // write the number of channels.
-        writer.Write((channels cast short))     
-        // write the sample rate. 44100 in this case. The number of audio samples per second
-        writer.Write(SAMPLE_RATE)       
-        writer.Write(((SAMPLE_RATE * channels) * (BITS_PER_SAMPLE / 8)))
-        writer.Write(((channels * (BITS_PER_SAMPLE / 8)) cast short))       
-        // 16 bits per sample
-        writer.Write(BITS_PER_SAMPLE)       
-        // "data" in ASCII. Start the data chunk.
-        writer.Write(1635017060)        
-        // write the number of bytes in the data portion
-        writer.Write(((((numberOfSamples * BITS_PER_SAMPLE) * channels) / 8) cast int))     
-        // copy over the actual audio data
-        self.outputStream.WriteTo(newOutputStream)      
-        // move the reference to the new stream
-        self.outputStream = newOutputStream
-
+     
+    def Start():
+        musicScore = Amvol.Amvol.musicScore
+        AudioSettings.GetDSPBufferSize(bufferSize,numBuffers)
+       
+        // Make a reference to the attached audio source
+        # pausAudio = gameObject.GetComponent(AudioSource)
 
     def Record():
         endPoint = 0
@@ -145,12 +55,10 @@ public class WavWriter(MonoBehaviour):
 
             width += 32 //give it time to fade out
             Invoke("StopRecording", width * musicScore.beatTime)
-            outputStream = MemoryStream()
-            outputWriter = BinaryWriter(outputStream)
+            allDataSources = array(single, 0)
             recOutput = true
         else:
             print('nothing to record')
-
 
     def Update():
         if mixingInProgress.active:
@@ -162,11 +70,109 @@ public class WavWriter(MonoBehaviour):
         musicScore.Stop()
         metronomeInstrument.volume = 1
         recOutput = false
-        # ConvertAndWrite(allDataSources, Path.Combine(directoryField.text, fileNameField.text) + ".wav")      //audio data is interlaced
-        Save(Path.Combine(directoryField.text, fileNameField.text) + ".wav")
+        ConvertAndWrite(allDataSources, Path.Combine(directoryField.text, fileNameField.text) + ".wav")      //audio data is interlaced
         print("writing to: " + Path.Combine(directoryField.text, fileNameField.text) + ".wav")
         mixingInProgress.SetActive(false)
+     
 
-    def Start():
-        musicScore = Amvol.Amvol.musicScore
-        # AudioSettings.GetDSPBufferSize(bufferSize,numBuffers)
+     
+    def OnAudioFilterRead(newData as (single), channels as int):
+        if recOutput:
+            allDataSources += newData
+        # print(AudioSettings.dspTime)
+
+     
+    def ConvertAndWrite(dataSource as (single), fileName as string):
+        intData as (int) = array(int, dataSource.Length)
+    //converting in 2 steps as float[] to Int16[], //then Int16[] to (Byte)
+       
+        bytesData as (Byte) = array(Byte, (dataSource.Length*2) +2)
+        print(bytesData.Length)
+    //bytesData array is twice the size of
+    //dataSource array because a float converted in Int16 is 2 bytes.
+       
+        rescaleFactor as single = 32767 //to convert float to Int16
+       
+        # i as int = 0
+        # while i < dataSource.Length:
+        #     intData[i] = dataSource[i]*rescaleFactor
+        #     byteArr as (Byte) = array(Byte, 2)
+        #     byteArr = BitConverter.GetBytes(intData[i])
+        #     bytesData[i*2] = byteArr[0]
+        #     bytesData[(i*2)+1] = byteArr[1]
+        #     # byteArr.CopyTo(bytesData,i*2)
+
+        #     i++
+        for i in range(dataSource.Length):
+            intData[i] = dataSource[i] * rescaleFactor
+            byteArr as (Byte) = array(Byte, 2)
+            byteArr = BitConverter.GetBytes(intData[i])
+            byteArr.CopyTo(bytesData, i*2)
+
+        StartWriting(fileName)
+        WriteHeader(bytesData.Length)
+        fileStream.Write(bytesData,0,bytesData.Length)
+        fileStream.Close()
+     
+
+    def StartWriting(name as string):
+        fileStream = FileStream(name, FileMode.Create)
+        emptyByte as byte = byte()
+       
+        i as int = 0
+        while i < headerSize:
+            //preparing the header
+            fileStream.WriteByte(emptyByte)
+            i++
+
+
+    def WriteHeader(dataSize as int):
+        fileStream.Seek(0,SeekOrigin.Begin)
+       
+        riff as (Byte) = System.Text.Encoding.UTF8.GetBytes("RIFF")
+        fileStream.Write(riff,0,4)
+       
+        chunkSize as (Byte) = BitConverter.GetBytes(fileStream.Length-8)
+        fileStream.Write(chunkSize,0,4)
+       
+        wave as (Byte) = System.Text.Encoding.UTF8.GetBytes("WAVE")
+        fileStream.Write(wave,0,4)
+       
+        fmt as (Byte) = System.Text.Encoding.UTF8.GetBytes("fmt ")
+        fileStream.Write(fmt,0,4)
+       
+        subChunk1 as (Byte) = BitConverter.GetBytes(16)
+        fileStream.Write(subChunk1,0,4)
+       
+        two as UInt16 = 2
+        one as UInt16 = 1
+     
+        audioFormat as (Byte) = BitConverter.GetBytes(one)
+        fileStream.Write(audioFormat,0,2)
+       
+        numChannels as (Byte) = BitConverter.GetBytes(two)
+        fileStream.Write(numChannels,0,2)
+       
+        sampleRate as (Byte) = BitConverter.GetBytes(outputRate)
+        fileStream.Write(sampleRate,0,4)
+       
+        byteRate as (Byte) = BitConverter.GetBytes(outputRate*4)
+     // sampleRate * bytesPerSample*number of channels, here 44100*2*2
+     
+        fileStream.Write(byteRate,0,4)
+       
+        four as UInt16 = 4
+        blockAlign as (Byte) = BitConverter.GetBytes(four)
+        fileStream.Write(blockAlign,0,2)
+       
+        sixteen as UInt16 = 16
+        bitsPerSample as (Byte) = BitConverter.GetBytes(sixteen)
+        fileStream.Write(bitsPerSample,0,2)
+       
+        dataString as (Byte) = System.Text.Encoding.UTF8.GetBytes("data")
+        fileStream.Write(dataString,0,4)
+       
+        subChunk2 as (Byte) = BitConverter.GetBytes(dataSize)
+        fileStream.Write(subChunk2,0,4)
+       
+        
