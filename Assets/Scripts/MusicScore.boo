@@ -20,7 +20,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     [Space(20)]
 
     public canvasButton as RectTransform
-    public canvasBgMat as Material
+    public canvasGrid as Transform
     public beatTime as single
     
     private k as int = 0
@@ -60,6 +60,9 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         noteSections = List of NoteSection()
         canvasButton.transform.localPosition = Vector2.zero 
         canvasButton.sizeDelta = Vector2(projectLength, layers)
+        // zoom out to whole note view
+        ZoomCanvas(Vector2.left) 
+        ZoomCanvas(Vector2.left) 
 
     def NewProject():
         if noteSections.Count > 0 or instrumentChanger.instruments.Count > 0:
@@ -85,8 +88,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         elif direction.x > 0:
             canvasButton.localScale.x *= 2f
         canvasButton.localScale.x = Mathf.Clamp(canvasButton.localScale.x, 0.05f, 2f)    
-        canvasButton.GetComponent(Image).material = canvasBgMat  
-        canvasBgMat.mainTextureScale.x = canvasButton.localScale.x
+        canvasGrid.localScale.x = 1 / canvasButton.localScale.x
 
 
     def Update():
@@ -271,7 +273,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         instrumentChanger.instrumentToChangeTo = null
 
         if lastTimeClicked + 0.2f > Time.time:
-            CreateNoteSection(cursor.localPosition, 64)
+            CreateNoteSection(cursor.localPosition, 128)
         lastTimeClicked = Time.time
 
     public def CreateMetronomeNoteSection(position as Vector2, startLength as int) as NoteSection:
@@ -305,8 +307,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             Destroy(currentNoteSection.gameObject)
 
     def FindAvailableSpace(noteSection as NoteSection, x as int, y as int, width as int) as Vector2:
-        x *= canvasButton.localScale.x
-        width *= canvasButton.localScale.x
+        # x *= canvasButton.localScale.x
+        # width *= canvasButton.localScale.x
 
         for nS in noteSections:
             if nS != noteSection:

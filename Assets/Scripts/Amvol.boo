@@ -13,7 +13,7 @@ public class Amvol (MonoBehaviour):
 
     def Awake():
         Amvol = self
-        Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true)
+        Screen.SetResolution(Screen.currentResolution.width-100, Screen.currentResolution.height-100, false)
 
     public static def GetMusicScore() as MusicScore:
         return Amvol.musicScore

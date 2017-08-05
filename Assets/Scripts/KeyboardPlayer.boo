@@ -21,6 +21,7 @@ class KeyboardPlayer (MonoBehaviour):
     private octaveLength as int
 
     private lastVolumeKnob as single
+    private rand as single
     
     def Awake():
         keys = (KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N, KeyCode.M, 
@@ -70,13 +71,25 @@ class KeyboardPlayer (MonoBehaviour):
         if usingMidiKeyboard == true:
             while k < 128:
                 if MidiMaster.GetKeyDown(k):
+                    rand = Random.Range(-1f, 1f)
+                    print(rand)
                     instrumentChanger.PlayNote(k,MidiMaster.GetKey(k))
+                    if rand > 0f:
+                        instrumentChanger.PlayNote(k+2,MidiMaster.GetKey(k))
+                    else:
+                        instrumentChanger.PlayNote(k+3,MidiMaster.GetKey(k))
+
                     overlays[k].SetActive(true)
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StartNote(k,MidiMaster.GetKey(k))
 
                 if MidiMaster.GetKeyUp(k):
                     instrumentChanger.StopPlayingNote(k)
+                    if rand > 0:
+                        instrumentChanger.StopPlayingNote(k+2)
+                    else:
+                        instrumentChanger.StopPlayingNote(k+3)
+
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StopNote(k)
                     overlays[k].SetActive(false)

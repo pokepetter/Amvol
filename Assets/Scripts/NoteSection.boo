@@ -93,15 +93,14 @@ public class NoteSection (MonoBehaviour):
 
     def Update():
         if startMouse != Vector2.zero and canMoveStuff:
-            mouse.x = Input.mousePosition.x / Screen.width * 100
-            mouse.y = Input.mousePosition.y / Screen.height * 100 /16 *9
+            snapX = 4 / transform.parent.localScale.x
+            print(snapX)
+            snapY = 0.5f / canvasButton.localScale.y
 
-            deltaMouse.x = Mathf.RoundToInt((mouse.x - startMouse.x) /1) *1
-            deltaMouse.y = Mathf.RoundToInt((mouse.y - startMouse.y) /4) *4
-            transform.localPosition = Vector2.Lerp(transform.localPosition,
-                                            Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), 
-                                                    Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44)),
-                                            Time.fixedDeltaTime * 30f)
+            transform.position = Input.mousePosition - startMouse
+            transform.localPosition.x = Mathf.RoundToInt(transform.localPosition.x /snapX) * snapX
+            transform.localPosition.y = Mathf.RoundToInt(transform.localPosition.y /snapY) * snapY
+
 
 
         if Input.GetKeyDown(KeyCode.Tab):
@@ -429,7 +428,7 @@ public class NoteSection (MonoBehaviour):
 
     def BeginDrag():
         # print("begin drag")
-        startMouse = Vector2(Input.mousePosition.x / Screen.width * 100, Input.mousePosition.y / Screen.height * 100 /16 *9)
+        startMouse = Input.mousePosition - transform.position
         startPosition = transform.localPosition
 
     def EndDrag():
