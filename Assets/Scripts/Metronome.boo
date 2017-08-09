@@ -1,8 +1,8 @@
 ﻿import UnityEngine
 import UnityEngine.UI
 
-class Metronome (MonoBehaviour): 
-        
+class Metronome (MonoBehaviour):
+
     public audioSource as AudioSource
     public musicScore as MusicScore
     public instrument as Instrument
@@ -17,13 +17,12 @@ class Metronome (MonoBehaviour):
 
     def Start():
         noteSection = musicScore.CreateMetronomeNoteSection(Vector2(0, 0), 128)
-        noteSection.transform.localPosition = Vector2.zero
+        noteSection.transform.localPosition.y = -4
         Destroy(noteSection.transform.GetComponent(DerpLerp))
         noteSection.transform.localScale = Vector2.zero
         noteSection.instrument = instrument
         noteSection.loops = 100
         instrument.audioClips[0] = audioSource.clip
-        # noteSection.ZoomOut() //this is a hack, it zooms in for som reason.
         x = 0
         while x < 128:
             for i in range(16):
@@ -32,7 +31,7 @@ class Metronome (MonoBehaviour):
 
 
     def Update():
-        
+
         if state == MetronomeState.MuteOnInput:
             if musicScore.playing:
                 if Input.anyKeyDown:

@@ -1,3 +1,2 @@
 proper drum instrument
 arpeggio patterns
-double click to zoom in and edit

@@ -20,9 +20,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     [Space(20)]
 
     public canvasButton as RectTransform
-    public canvasGrid as Transform
+    public wholeNoteGrid as Transform
+    public wholeNoteGridRenderer as GridRenderer
     public beatTime as single
-    
+
     private k as int = 0
 
     public noteSections as List of NoteSection
@@ -31,7 +32,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     public x as int //pos
     private y as int //note
     private z as single //volume and short/long
-    
+
     private hit as RaycastHit
 
     public timeline as RectTransform
@@ -41,7 +42,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     public cursor as Transform
 
     public instrumentChanger as InstrumentChanger
-    
+
     private projectLength as int = 240 * 5
     private layers as int = 128
     private tempoMarkers as (int)
@@ -50,19 +51,40 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     private lastTimeClicked as single
     private originalCanvasButtonX as single
     private originalPosition as int
-    
+
     public getTempoBeforeRecording as bool
     private waitForTempoInput as bool
     private beatInputsLeft as int
     public tempoTapper as TempoTapper
 
+    public currentZoom as int
+    private zoomLevels as ((Vector2))
+
     def Awake():
         noteSections = List of NoteSection()
-        canvasButton.transform.localPosition = Vector2.zero 
+        canvasButton.transform.localPosition = Vector2.zero
         canvasButton.sizeDelta = Vector2(projectLength, layers)
+
+        currentZoom = 1
+        zoomLevels = (
+            //(main grid x, main grid y, intarnal grid x, internal grid y)
+            (Vector2(0.5, 0.5), Vector2(1, 1)),      //small
+            (Vector2(1, 1),     Vector2(1, 1)),      //normal
+            (Vector2(2, 2),     Vector2(1, 1)),      //big
+
+            (Vector2(1, 10),    Vector2(1, 1)),      //wholes
+            (Vector2(1, 10),    Vector2(0.5, 1)),    //halves
+            (Vector2(1, 10),    Vector2(0.25, 1)),   //quarters
+            (Vector2(2, 10),    Vector2(0.125, 1)),  //eights
+            (Vector2(4, 10),    Vector2(0.0625, 1)),  //16th
+            (Vector2(8, 10),    Vector2(0.03125, 1)),  //36th
+            (Vector2(16, 10),    Vector2(0.015625, 1)),  //64th
+            (Vector2(32, 10),    Vector2(0.0078125, 1))   //128th
+            )
+
         // zoom out to whole note view
-        ZoomCanvas(Vector2.left) 
-        ZoomCanvas(Vector2.left) 
+        # ZoomCanvas(Vector2.left)
+        # ZoomCanvas(Vector2.left)
 
     def NewProject():
         if noteSections.Count > 0 or instrumentChanger.instruments.Count > 0:
@@ -79,24 +101,63 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
 
     def OnScroll(eventData as PointerEventData):
-        ZoomCanvas(Vector2(eventData.scrollDelta.y, 0f))
+        ZoomCanvas(currentZoom + eventData.scrollDelta.y)
 
 
-    def ZoomCanvas(direction as Vector2):
-        if direction.x < 0:
-            canvasButton.localScale.x *= 0.5f
-        elif direction.x > 0:
-            canvasButton.localScale.x *= 2f
-        canvasButton.localScale.x = Mathf.Clamp(canvasButton.localScale.x, 0.05f, 2f)    
-        canvasGrid.localScale.x = 1 / canvasButton.localScale.x
+    def ZoomCanvas(newZoom as int):
+        if newZoom < 0:
+            newZoom = 0
+        elif newZoom > zoomLevels.Length:
+            newZoom = zoomLevels.Length
+        currentZoom = newZoom
+
+
+        canvasButton.transform.localScale = zoomLevels[newZoom][0]
+        if newZoom <= 2:
+            currentNoteSection.canvasButton.gameObject.SetActive(false)
+            currentNoteSection.canvasButton.gameObject.SetActive(false)
+            currentNoteSection.canMoveStuff = true
+            currentNoteSection.handles.gameObject.SetActive(true)
+            currentNoteSection.loopGrid.gameObject.SetActive(true)
+            currentNoteSection.scrollRect.enabled = false
+            currentNoteSection.zoomOutButton.SetActive(false)
+            currentNoteSection.outline.enabled = true
+        else:
+            currentNoteSection.canvasButton.gameObject.SetActive(true)
+            currentNoteSection.canMoveStuff = false
+            currentNoteSection.handles.gameObject.SetActive(false)
+            currentNoteSection.loopGrid.gameObject.SetActive(false)
+            currentNoteSection.scrollRect.enabled = true
+            currentNoteSection.zoomOutButton.SetActive(true)
+            currentNoteSection.outline.enabled = false
+
+            for i in range(currentNoteSection.canvasButton.childCount):
+                currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
+
+            currentNoteSection.canvasButton.GetChild(newZoom-3).gameObject.SetActive(true)
+
+            /*currentNoteSection.transform.grid.localScale = zoomLevels[newZoom][1]*/
+
+        currentZoom = newZoom
+
+
+        canvasButton.transform.localPosition = Vector2(
+            (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
+            (-currentNoteSection.transform.localPosition.y + 4) * canvasButton.transform.localScale.y)
 
 
     def Update():
         if Input.GetKeyDown(KeyCode.LeftArrow):
-            ZoomCanvas(Vector2.left)
+            ZoomCanvas(currentZoom-1)
 
         if Input.GetKeyDown(KeyCode.RightArrow):
-            ZoomCanvas(Vector2.right)
+            ZoomCanvas(currentZoom+1)
+
+        /*if Input.GetKeyDown(KeyCode.UpArrow):
+            ZoomCanvas(Vector2.up)*/
+
+        /*if Input.GetKeyDown(KeyCode.DownArrow):
+            ZoomCanvas(Vector2.down)*/
 
         if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.R):
             Record()
@@ -137,13 +198,13 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     def NextTimeStep():
         x++
-        if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
-            canvasButton.localPosition.x -= 0.125f * canvasButton.localScale.x
+        /*if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
+            canvasButton.localPosition.x -= 0.03125f * canvasButton.localScale.x*/
 
         if recording and newNoteSection != null:
-            newNoteSection.sizeDelta.x += 0.125f
+            newNoteSection.sizeDelta.x += 0.03125f
 
-        timeIndicator.localPosition.x = x * 0.125f
+        timeIndicator.localPosition.x = x * 0.03125f //divide by two five times
         # currentTimeText.text = x.ToString()
 
     def Record(newGetTempoBeforeRecording as bool):
@@ -167,7 +228,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             //find open space for the note section
             openPosition = cursor.transform.localPosition
             for nS in noteSections:
-                if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y) 
+                if (Mathf.RoundToInt(openPosition.y) == Mathf.RoundToInt(nS.transform.localPosition.y)
                 and Mathf.RoundToInt(openPosition.x) < Mathf.RoundToInt(nS.transform.localPosition.x + nS.GetComponent(RectTransform).sizeDelta.x)
                 ):
                     openPosition.y += 4f
@@ -179,7 +240,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             newNoteSection = currentNoteSection.transform.GetComponent(RectTransform)
             newNoteSection.sizeDelta.x = 0
             Play()
-            
+
     def StopRecording():
         recordingActiveButton.SetActive(false)
         currentNoteSection.Stop()
@@ -189,8 +250,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             currentRect = currentNoteSection.GetComponent(RectTransform)
             currentRect.sizeDelta.x = Mathf.CeilToInt(currentRect.sizeDelta.x)
             recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
-            currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength)/8, Vector2.right)
-            currentNoteSection.resizeButtonRight.anchoredPosition.x = currentNoteSection.sectionLength / 8
+            currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength), Vector2.right)
             currentNoteSection.automation.DrawGrid()
 
         Stop()
@@ -208,15 +268,15 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                     # print("play from indicator")
                 //also play note section crossing the start point
                 elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) > originalPosition:
-                    
+
                     distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 8
                     # print("note section crossing " + (-distanceToStartPoint))
                     noteSection.Play(-distanceToStartPoint)
-                    
+
             metronomeNoteSection.Play()
         else:
             Stop()
-            
+
 
     def Pause():
         if playing:
@@ -247,7 +307,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         pauseButton.SetActive(false)
         timeIndicator.localPosition.x = x * 0.125f
         # currentTimeText.text = x.ToString()
-        
+
 
     public def SetBPM(newBPM as int):
         beatTime = 1.875f / newBPM
@@ -273,7 +333,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         instrumentChanger.instrumentToChangeTo = null
 
         if lastTimeClicked + 0.2f > Time.time:
-            CreateNoteSection(cursor.localPosition, 128)
+            roundedPos = Vector2(
+                Mathf.FloorToInt(cursor.localPosition.x / 4) * 4,
+                Mathf.FloorToInt(cursor.localPosition.y / 4) * 4)
+            CreateNoteSection(roundedPos, 64)
         lastTimeClicked = Time.time
 
     public def CreateMetronomeNoteSection(position as Vector2, startLength as int) as NoteSection:
@@ -325,4 +388,4 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                         x = currentRect.anchoredPosition.x - width
 
         availablePosition = Vector2(x,y)
-        return availablePosition 
+        return availablePosition

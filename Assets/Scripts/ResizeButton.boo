@@ -1,7 +1,7 @@
 ﻿import UnityEngine
 import System.Collections
 
-class ResizeButton (MonoBehaviour): 
+class ResizeButton (MonoBehaviour):
 
     public startMouseX as single
     public mouseX as int
@@ -13,7 +13,7 @@ class ResizeButton (MonoBehaviour):
 
     public direction as Direction
 
-    private originalPosition as single
+    private originalX as single
 
     enum Direction:
         Left
@@ -21,28 +21,29 @@ class ResizeButton (MonoBehaviour):
 
     def Start():
         if direction == Direction.Right:
-            rectTransform.anchoredPosition.x = noteSection.sectionLength / 8
-        originalPosition = rectTransform.anchoredPosition.x
+            rectTransform.anchoredPosition.x = noteSection.sectionLength / 16
+        originalX = rectTransform.anchoredPosition.x
 
-    public def BeginDrag():
-        print("begin drag")
-        startMouseX = mouseX
+    def BeginDrag():
+        /*print("begin drag")*/
+        originalX = transform.localPosition.x
+        startMouseX = Input.mousePosition.x - transform.position.x
+        startPosition = transform.localPosition
 
-    public def EndDrag():
-        print("end drag: " + deltaMouseX)
-        startMouseX = 0
-        
+    def EndDrag():
+        deltaMouseX = transform.localPosition.x - originalX
+        originalX = rectTransform.anchoredPosition.x
+
         if direction == Direction.Left:
             addDirection = Vector2.left
         else:
             addDirection = Vector2.right
 
-        noteSection.AddLength(deltaMouseX, Vector2.right)
-        originalPosition = rectTransform.anchoredPosition.x
+        noteSection.AddLength(deltaMouseX * 16, Vector2.right)
 
-    public def Update():
-        mouseX = Input.mousePosition.x / Screen.width * 100
 
-        if startMouseX > 0:
-            deltaMouseX = Mathf.FloorToInt((mouseX - startMouseX) /4) *4
-            rectTransform.anchoredPosition.x = originalPosition + deltaMouseX
+    def Update():
+        if startMouseX != 0:
+            snapX = 1
+            transform.position.x = Input.mousePosition.x - startMouseX
+            transform.localPosition.x = Mathf.RoundToInt(transform.localPosition.x /snapX) * snapX

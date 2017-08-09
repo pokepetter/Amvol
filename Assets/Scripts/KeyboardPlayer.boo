@@ -2,7 +2,7 @@
 import UnityEngine.UI
 import MidiJack
 
-class KeyboardPlayer (MonoBehaviour): 
+class KeyboardPlayer (MonoBehaviour):
 
     public pianoRoll as Transform
     public noteOverlay as GameObject
@@ -22,24 +22,24 @@ class KeyboardPlayer (MonoBehaviour):
 
     private lastVolumeKnob as single
     private rand as single
-    
+
     def Awake():
-        keys = (KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N, KeyCode.M, 
-        KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.J, KeyCode.K, KeyCode.L, 
-        KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T, KeyCode.Y, KeyCode.U, KeyCode.I, KeyCode.O, KeyCode.P, 
-        KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, 
+        keys = (KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N, KeyCode.M,
+        KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.J, KeyCode.K, KeyCode.L,
+        KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T, KeyCode.Y, KeyCode.U, KeyCode.I, KeyCode.O, KeyCode.P,
+        KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6,
         KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9)
 
         noteNames = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 
         InstantiateNoteOverlays()
-        
-        
+
+
     def Start():
         musicScore = Amvol.GetMusicScore()
         instrumentChanger = Amvol.GetInstrumentChanger()
         UpdateNoteNames()
-        
+
     def Update():
         if Input.GetKeyDown(KeyCode.Comma):
             octaveOffset--
@@ -56,7 +56,7 @@ class KeyboardPlayer (MonoBehaviour):
                     overlays[i + (octaveOffset * octaveLength)].SetActive(true)
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StartNote(i + (octaveOffset * octaveLength), 1f)
-                    
+
                 if Input.GetKeyUp(keys[i]):
                     instrumentChanger.StopPlayingNote(i + (octaveOffset * octaveLength))
                     overlays[i + (octaveOffset * octaveLength)].SetActive(false)
@@ -71,13 +71,13 @@ class KeyboardPlayer (MonoBehaviour):
         if usingMidiKeyboard == true:
             while k < 128:
                 if MidiMaster.GetKeyDown(k):
-                    rand = Random.Range(-1f, 1f)
-                    print(rand)
+                    /*rand = Random.Range(-1f, 1f)
+                    print(rand)*/
                     instrumentChanger.PlayNote(k,MidiMaster.GetKey(k))
-                    if rand > 0f:
+                    /*if rand > 0f:
                         instrumentChanger.PlayNote(k+2,MidiMaster.GetKey(k))
                     else:
-                        instrumentChanger.PlayNote(k+3,MidiMaster.GetKey(k))
+                        instrumentChanger.PlayNote(k+3,MidiMaster.GetKey(k))*/
 
                     overlays[k].SetActive(true)
                     if musicScore.recording and musicScore.playing:

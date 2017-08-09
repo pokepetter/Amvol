@@ -14,9 +14,7 @@ public class NoteSection (MonoBehaviour):
 
     public isRecording as bool
     public canvasButton as RectTransform
-    public canvasBgMat as Material
-    public bg2 as Sprite 
-    
+
     private k as int = 0
 
     public notes as (single, 2)
@@ -24,12 +22,11 @@ public class NoteSection (MonoBehaviour):
     public x as int //pos
     private y as int //note
     private z as single //volume and short/long
-    
+
     private input as (single)
     private scaleChanger as ScaleChanger
     private hit as RaycastHit
     public canvas as RectTransform
-    public pianoRoll as RectTransform
     public timeline as RectTransform
     private currentPositionOnTimeline as int
 
@@ -37,7 +34,7 @@ public class NoteSection (MonoBehaviour):
     public instrument as Instrument
     public musicScore as MusicScore
     public noteSectionRectTransform as RectTransform
-    
+
     public sectionLength as int = 64
     public loops as single = 1f
     public loopsLeft as single
@@ -58,17 +55,15 @@ public class NoteSection (MonoBehaviour):
     private startPosition as Vector2
 
     private lastTimeClicked as single
-    public canvasGrid as Image
-    public canvasButtonButton as Button
     public handles as GameObject
     public loopGrid as GridRenderer
     public zoomOutButton as GameObject
     public playButton as GameObject
     public stopButton as GameObject
-    
+
     public indicator as Transform
-    private originalPosition as Vector3
-    private canMoveStuff as bool = true
+    public canMoveStuff as bool = true
+
 
     def Awake():
         scaleChanger = Amvol.GetScaleChanger()
@@ -79,9 +74,7 @@ public class NoteSection (MonoBehaviour):
         connectedNotes = List of Note()
         transform.localScale = Vector3.zero
         DerpLerp.Scale(transform, Vector3.one, 0.2f)
-        
-        canvasGrid.enabled = false
-        canvasButtonButton.enabled = false
+
         handles.SetActive(true)
         scrollRect.enabled = false
         automation.gameObject.SetActive(false)
@@ -93,9 +86,10 @@ public class NoteSection (MonoBehaviour):
 
     def Update():
         if startMouse != Vector2.zero and canMoveStuff:
-            snapX = 4 / transform.parent.localScale.x
-            print(snapX)
-            snapY = 0.5f / canvasButton.localScale.y
+            /*snapX = 2 / transform.parent.localScale.x*/
+            /*print(snapX)*/
+            snapX = 1
+            snapY = 4 / canvasButton.localScale.y
 
             transform.position = Input.mousePosition - startMouse
             transform.localPosition.x = Mathf.RoundToInt(transform.localPosition.x /snapX) * snapX
@@ -123,7 +117,7 @@ public class NoteSection (MonoBehaviour):
                         if notes[x-1,y] == 0f:
                             PlayNote(y, notes[x,y])
                     else: //fist note
-                        PlayNote(y, notes[x,y]) 
+                        PlayNote(y, notes[x,y])
 
 
                 if isRecording:
@@ -131,7 +125,7 @@ public class NoteSection (MonoBehaviour):
                         SetNote(x, y, input[y])
                 if notes[x,y] == 0f and x > 0 and notes[x-1,y] > 0f:
                     StopPlayingNote(y)
-            
+
             x++
 
             if loopsLeft >= 1f:
@@ -144,7 +138,7 @@ public class NoteSection (MonoBehaviour):
             else:
                 if x >= sectionLength * loopsLeft:
                     Stop()
-            
+
 
         indicator.localPosition.x = ((loops - loopsLeft) * sectionLength) + x
 
@@ -185,7 +179,7 @@ public class NoteSection (MonoBehaviour):
                 StopPlayingNote(i)
         except:
             pass //destroyed
-        
+
 
 
     def SetNote(x as int, y as int, z as single):
@@ -225,7 +219,7 @@ public class NoteSection (MonoBehaviour):
         #         break
 
         # noteLengthInTime = beatTime * nextNoteLength
-        # instrument.attack = 
+        # instrument.attack =
 
 
         input[y] = 0
@@ -252,17 +246,18 @@ public class NoteSection (MonoBehaviour):
         //set name
         transform.GetComponent(Image).color = instrument.instrumentColor
 
-    def SetLength(length as int): 
+    def SetLength(length as int):
         notes = matrix(single, length, maxNotes)
         sectionLength = length
-        noteSectionRectTransform.sizeDelta.x = length /8f
+        noteSectionRectTransform.sizeDelta.x = length /16f
+        resizeButtonRight.anchoredPosition.x = length /16f
         canvasButton.sizeDelta.x = sectionLength
         CalculateLoops()
 
 
     def CalculateLoops():
-        loops = noteSectionRectTransform.sizeDelta.x * 8 /sectionLength
-        loopGrid.spacingX = sectionLength /8
+        loops = noteSectionRectTransform.sizeDelta.x * 16 /sectionLength
+        loopGrid.spacingX = sectionLength /16
         loopGrid.DrawGrid()
         if automation.lineRenderer.points.Length < noteSectionRectTransform.rect.width:
             addedPoints = array(Vector2, noteSectionRectTransform.rect.width - automation.lineRenderer.points.Length)
@@ -274,8 +269,8 @@ public class NoteSection (MonoBehaviour):
 
     def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
-        length *= 8
-        canvasButton.sizeDelta.x += length
+        canvasButton.sizeDelta.x += length / 16
+        /*resizeButtonRight.anchoredPosition.x += length / 16*/
 
         if direciton == Vector2.right:
             if length > 0:
@@ -287,13 +282,10 @@ public class NoteSection (MonoBehaviour):
                         newNotes[x,y] = notes[x,y]
                 notes = newNotes
 
-                guiLength = newLength /8
-                resizeButtonRight.anchoredPosition.x = guiLength
-                if noteSectionRectTransform.sizeDelta.x <= guiLength:
-                    noteSectionRectTransform.sizeDelta.x = guiLength
-                    loopButtonRight.anchoredPosition.x = 0
+                noteSectionRectTransform.sizeDelta.x += length / 16
+                loopButtonRight.anchoredPosition.x = 0
 
-                automation.lineRenderer.points += array(Vector2, length/8)
+                automation.lineRenderer.points += array(Vector2, length/16)
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -320,8 +312,8 @@ public class NoteSection (MonoBehaviour):
                         newNotes[x,y] = notes[x,y]
                 notes = newNotes
 
-                guiLength = newLength /8
-                resizeButtonLeft.anchoredPosition.x = 0
+                guiLength = newLength /16
+                resizeButtonLeft.anchoredPosition.x = guiLength
                 if noteSectionRectTransform.sizeDelta.x < guiLength:
                     noteSectionRectTransform.sizeDelta.x += guiLength
             else:
@@ -371,41 +363,9 @@ public class NoteSection (MonoBehaviour):
         # newTempoMarker.transform.SetParent(timeline, false)
         # newTempoMarker.transform.localPosition.x = x
 
-    def ZoomIn():
-        canMoveStuff = false
-        originalPosition = transform.parent.GetComponent(RectTransform).anchoredPosition
-        transform.parent.GetComponent(RectTransform).anchoredPosition = Vector2(-noteSectionRectTransform.anchoredPosition.x +4, -noteSectionRectTransform.anchoredPosition.y +4)
-        transform.localScale = Vector3.one * 6f
-        noteSectionRectTransform.sizeDelta.y = 6f
-
-        canvasGrid.enabled = true
-        canvasButtonButton.enabled = true
-        canvasButton.sizeDelta.x = sectionLength
-        handles.SetActive(false)
-        loopGrid.gameObject.SetActive(false)
-        scrollRect.enabled = true
-        
-        zoomOutButton.SetActive(true)
-        outline.effectDistance = Vector2.one * 0.05f
-        outline.effectColor = Color.grey
 
     def ZoomOut():
-        canMoveStuff = true
-        transform.parent.GetComponent(RectTransform).anchoredPosition = originalPosition
-        transform.localScale = Vector3.one
-        noteSectionRectTransform.sizeDelta.y = 3.85f
-
-        canvasGrid.enabled = false
-        canvasButtonButton.enabled = false
-        handles.SetActive(true)
-        loopGrid.gameObject.SetActive(true)
-        scrollRect.enabled = false
-
-        zoomOutButton.SetActive(false)
-        outline.effectDistance = Vector2.one * 0.05f
-        outline.effectColor = Color.grey
-
-
+        musicScore.ZoomCanvas(1)
 
     def Select():
         if Input.GetKey(KeyCode.LeftShift) == false:
@@ -419,7 +379,7 @@ public class NoteSection (MonoBehaviour):
             UpdateInstrument(instrumentChanger.instrumentToChangeTo)
 
         if lastTimeClicked + 0.2f > Time.time:
-            ZoomIn()
+            musicScore.ZoomCanvas(3)
         lastTimeClicked = Time.time
 
     def Deselect():
@@ -433,9 +393,9 @@ public class NoteSection (MonoBehaviour):
 
     def EndDrag():
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
-        transform.localPosition = musicScore.FindAvailableSpace(self, 
-                                desirablePosition.x, 
-                                desirablePosition.y, 
+        transform.localPosition = musicScore.FindAvailableSpace(self,
+                                desirablePosition.x,
+                                desirablePosition.y,
                                 noteSectionRectTransform.sizeDelta.x)
         startMouse = Vector2.zero
 
