@@ -16,18 +16,17 @@ class Metronome (MonoBehaviour):
 
 
     def Start():
-        noteSection = musicScore.CreateMetronomeNoteSection(Vector2(0, 0), 128)
+        noteSection = musicScore.CreateMetronomeNoteSection(Vector2(0, 0), 64)
+        noteSection.transform.parent = transform
         noteSection.transform.localPosition.y = -4
         Destroy(noteSection.transform.GetComponent(DerpLerp))
         noteSection.transform.localScale = Vector2.zero
         noteSection.instrument = instrument
         noteSection.loops = 100
         instrument.audioClips[0] = audioSource.clip
-        x = 0
-        while x < 128:
-            for i in range(16):
-                noteSection.SetNote(x+i, 16, 1f)
-            x += 32
+        /*for x in range(0, 64, 16):
+            for i in range(8):
+                noteSection.SetNote(x+i, 16, 1f)*/
 
 
     def Update():

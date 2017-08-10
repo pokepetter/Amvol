@@ -143,7 +143,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
         canvasButton.transform.localPosition = Vector2(
             (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
-            (-currentNoteSection.transform.localPosition.y + 4) * canvasButton.transform.localScale.y)
+            (-currentNoteSection.transform.localPosition.y + 0) * canvasButton.transform.localScale.y)
 
 
     def Update():
@@ -202,9 +202,9 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             canvasButton.localPosition.x -= 0.03125f * canvasButton.localScale.x*/
 
         if recording and newNoteSection != null:
-            newNoteSection.sizeDelta.x += 0.03125f
+            newNoteSection.sizeDelta.x += 0.0625f
 
-        timeIndicator.localPosition.x = x * 0.03125f //divide by two five times
+        timeIndicator.localPosition.x = x * 0.0625f //divide by two five times
         # currentTimeText.text = x.ToString()
 
     def Record(newGetTempoBeforeRecording as bool):
@@ -249,7 +249,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             //trim empty space at the end, not used in the recording
             currentRect = currentNoteSection.GetComponent(RectTransform)
             currentRect.sizeDelta.x = Mathf.CeilToInt(currentRect.sizeDelta.x)
-            recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 8
+            recordedLength = currentNoteSection.GetComponent(RectTransform).sizeDelta.x * 16
             currentNoteSection.AddLength(-(currentNoteSection.sectionLength - recordedLength), Vector2.right)
             currentNoteSection.automation.DrawGrid()
 
@@ -310,8 +310,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
 
     public def SetBPM(newBPM as int):
-        beatTime = 1.875f / newBPM
-        print("set BPM to " + newBPM + ", beatTime: " + 1.875f / newBPM)
+        beatTime = 3.75f / newBPM
+        print("set BPM to " + newBPM + ", beatTime: " + 3.75f / newBPM)
 
     public def CreateTempoMarker(x as int, newTempo as int):
         timeline.sizeDelta.x = projectLength

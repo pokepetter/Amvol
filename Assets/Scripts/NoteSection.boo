@@ -86,8 +86,6 @@ public class NoteSection (MonoBehaviour):
 
     def Update():
         if startMouse != Vector2.zero and canMoveStuff:
-            /*snapX = 2 / transform.parent.localScale.x*/
-            /*print(snapX)*/
             snapX = 1
             snapY = 4 / canvasButton.localScale.y
 
@@ -205,13 +203,13 @@ public class NoteSection (MonoBehaviour):
         input[y] = z
 
     def StopNote(y as int):
-        tempY = 0
+        /*tempY = 0
         tempX = 0
         for tempY in range(maxNotes):
             for tempX in range(256):
                 if notes[x,y] > 0.01f:
                     nextNoteX = tempX
-                    nextNoteY = tempY
+                    nextNoteY = tempY*/
 
         # for i in range(256):
         #     if notes[nextNoteX+i,nextNoteY] < 0.01f:
@@ -234,7 +232,7 @@ public class NoteSection (MonoBehaviour):
 
         if not isRecording:
             for n in connectedNotes:
-                n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/8].y / noteSectionRectTransform.rect.height
+                n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/16].y / noteSectionRectTransform.rect.height
 
     def StopPlayingNote(y as int):
         if not instrument.isDrumSet:
@@ -393,10 +391,11 @@ public class NoteSection (MonoBehaviour):
 
     def EndDrag():
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
-        transform.localPosition = musicScore.FindAvailableSpace(self,
+        transform.localPosition = desirablePosition
+        /*transform.localPosition = musicScore.FindAvailableSpace(self,
                                 desirablePosition.x,
                                 desirablePosition.y,
-                                noteSectionRectTransform.sizeDelta.x)
+                                noteSectionRectTransform.sizeDelta.x)*/
         startMouse = Vector2.zero
 
     def NumberOfNotes() as int:
