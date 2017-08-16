@@ -59,6 +59,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public currentZoom as int
     private zoomLevels as ((Vector2))
+    private noteSizes as (int)
 
     def Awake():
         noteSections = List of NoteSection()
@@ -82,9 +83,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             (Vector2(32, 10),    Vector2(0.0078125, 1))   //128th
             )
 
-        // zoom out to whole note view
-        # ZoomCanvas(Vector2.left)
-        # ZoomCanvas(Vector2.left)
+        noteSizes = (0, 0, 0, 64, 32, 16, 8, 4, 2, 1)
+
+    def Start():
+        ZoomCanvas(1)
 
     def NewProject():
         if noteSections.Count > 0 or instrumentChanger.instruments.Count > 0:
@@ -98,13 +100,17 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         instrumentChanger.instruments.Clear()
         instrumentChanger.Initialize()
         tempoTapper.tempo = 60
+        ZoomCanvas(1)
 
 
     def OnScroll(eventData as PointerEventData):
         ZoomCanvas(currentZoom + eventData.scrollDelta.y)
 
 
+    private originalCanvasPosition as Vector2
+
     def ZoomCanvas(newZoom as int):
+        print("ZoomCanvas " + newZoom)
         if newZoom < 0:
             newZoom = 0
         elif newZoom > zoomLevels.Length:
@@ -113,37 +119,41 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
 
         canvasButton.transform.localScale = zoomLevels[newZoom][0]
+        for i in range(zoomLevels.Length-4):
+            currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
+
         if newZoom <= 2:
-            currentNoteSection.canvasButton.gameObject.SetActive(false)
-            currentNoteSection.canvasButton.gameObject.SetActive(false)
             currentNoteSection.canMoveStuff = true
+            currentNoteSection.canvasButton.GetComponent(Button).enabled = false
             currentNoteSection.handles.gameObject.SetActive(true)
             currentNoteSection.loopGrid.gameObject.SetActive(true)
             currentNoteSection.scrollRect.enabled = false
             currentNoteSection.zoomOutButton.SetActive(false)
             currentNoteSection.outline.enabled = true
+            DerpLerp.MoveLocal(canvasButton.transform, originalCanvasPosition, 0.1f)
         else:
-            currentNoteSection.canvasButton.gameObject.SetActive(true)
+            if currentNoteSection.canMoveStuff:
+                originalCanvasPosition = canvasButton.transform.localPosition
+                print(originalCanvasPosition)
             currentNoteSection.canMoveStuff = false
+            currentNoteSection.canvasButton.GetComponent(Button).enabled = true
             currentNoteSection.handles.gameObject.SetActive(false)
             currentNoteSection.loopGrid.gameObject.SetActive(false)
             currentNoteSection.scrollRect.enabled = true
             currentNoteSection.zoomOutButton.SetActive(true)
             currentNoteSection.outline.enabled = false
 
-            for i in range(currentNoteSection.canvasButton.childCount):
-                currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
+            DerpLerp.MoveLocal(canvasButton.transform, Vector2(
+                (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
+                (-currentNoteSection.transform.localPosition.y + .25) * canvasButton.transform.localScale.y),
+                0.1f)
+
 
             currentNoteSection.canvasButton.GetChild(newZoom-3).gameObject.SetActive(true)
-
-            /*currentNoteSection.transform.grid.localScale = zoomLevels[newZoom][1]*/
+            NoteSizeSetter.noteSizeSetter.noteSize = noteSizes[newZoom]
 
         currentZoom = newZoom
 
-
-        canvasButton.transform.localPosition = Vector2(
-            (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
-            (-currentNoteSection.transform.localPosition.y + 0) * canvasButton.transform.localScale.y)
 
 
     def Update():
@@ -153,11 +163,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if Input.GetKeyDown(KeyCode.RightArrow):
             ZoomCanvas(currentZoom+1)
 
-        /*if Input.GetKeyDown(KeyCode.UpArrow):
-            ZoomCanvas(Vector2.up)*/
-
-        /*if Input.GetKeyDown(KeyCode.DownArrow):
-            ZoomCanvas(Vector2.down)*/
+        if Input.mouseScrollDelta.y < 0:
+            ZoomCanvas(currentZoom-1)
+        elif Input.mouseScrollDelta.y > 0:
+            ZoomCanvas(currentZoom+1)
 
         if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.R):
             Record()
@@ -198,8 +207,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     def NextTimeStep():
         x++
-        /*if timeIndicator.localPosition.x > 38 / canvasButton.localScale.x:
-            canvasButton.localPosition.x -= 0.03125f * canvasButton.localScale.x*/
+        if timeIndicator.localPosition.x > 40 / canvasButton.localScale.x:
+            canvasButton.localPosition.x -= 0.0625f * canvasButton.localScale.x
 
         if recording and newNoteSection != null:
             newNoteSection.sizeDelta.x += 0.0625f
@@ -263,13 +272,13 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             pauseButton.SetActive(true)
             originalPosition = x
             for noteSection in noteSections:
-                if noteSection.transform.localPosition.x * 8 >= originalPosition: //play from indicator
-                    noteSection.Play((noteSection.transform.localPosition.x * 8)-originalPosition)
+                if noteSection.transform.localPosition.x * 16 >= originalPosition: //play from indicator
+                    noteSection.Play((noteSection.transform.localPosition.x * 16)-originalPosition)
                     # print("play from indicator")
                 //also play note section crossing the start point
-                elif (noteSection.transform.localPosition.x * 8) + (noteSection.sectionLength * noteSection.loops) > originalPosition:
+                elif (noteSection.transform.localPosition.x * 16) + (noteSection.sectionLength * noteSection.loops) > originalPosition:
 
-                    distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 8
+                    distanceToStartPoint = originalPosition - noteSection.transform.localPosition.x * 16
                     # print("note section crossing " + (-distanceToStartPoint))
                     noteSection.Play(-distanceToStartPoint)
 
@@ -282,7 +291,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if playing:
             Stop()
             originalPosition = x
-            timeIndicator.localPosition.x = x * 0.125f
+            timeIndicator.localPosition.x = x * 0.0625f
 
     def Stop():
         CancelInvoke()
@@ -325,9 +334,9 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent(RectTransform), ped.position, ped.pressEventCamera, localCursorPosition) and Input.GetKey(KeyCode.LeftAlt) == false:
             localCursorPosition = Vector2(Mathf.Round(localCursorPosition.x /1) *1, Mathf.FloorToInt(localCursorPosition.y /4) *4)
 
-        x = localCursorPosition.x * 8 / canvasButton.transform.localScale.x
-        timeIndicator.localPosition.x = x * 0.125f
-        cursor.localPosition = Vector3(timeIndicator.localPosition.x, localCursorPosition.y)
+        x = localCursorPosition.x * 16 / canvasButton.transform.localScale.x
+        timeIndicator.localPosition.x = x * 0.0625f
+        cursor.localPosition = Vector3(timeIndicator.localPosition.x, localCursorPosition.y / canvasButton.transform.localScale.y)
 
         DeselectAll()
         instrumentChanger.instrumentToChangeTo = null

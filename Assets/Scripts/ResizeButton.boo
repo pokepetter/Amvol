@@ -31,6 +31,7 @@ class ResizeButton (MonoBehaviour):
         startPosition = transform.localPosition
 
     def EndDrag():
+        startMouseX = 0
         deltaMouseX = transform.localPosition.x - originalX
         originalX = rectTransform.anchoredPosition.x
 

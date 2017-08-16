@@ -57,6 +57,7 @@ public class NoteSection (MonoBehaviour):
     private lastTimeClicked as single
     public handles as GameObject
     public loopGrid as GridRenderer
+    public grids as (GridRenderer)
     public zoomOutButton as GameObject
     public playButton as GameObject
     public stopButton as GameObject
@@ -234,6 +235,7 @@ public class NoteSection (MonoBehaviour):
             for n in connectedNotes:
                 n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/16].y / noteSectionRectTransform.rect.height
 
+
     def StopPlayingNote(y as int):
         if not instrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
@@ -254,25 +256,32 @@ public class NoteSection (MonoBehaviour):
 
 
     def CalculateLoops():
+        print("CalculateLoops")
         loops = noteSectionRectTransform.sizeDelta.x * 16 /sectionLength
         loopGrid.spacingX = sectionLength /16
         loopGrid.DrawGrid()
         if automation.lineRenderer.points.Length < noteSectionRectTransform.rect.width:
-            addedPoints = array(Vector2, noteSectionRectTransform.rect.width - automation.lineRenderer.points.Length)
-            for p in addedPoints:
-                p.y = automation.lineRenderer.points[automation.lineRenderer.points.Length-1].y
+            addedPoints = array(Vector2, noteSectionRectTransform.rect.width - automation.lineRenderer.points.Length+1)
+            for i in range(addedPoints.Length):
+                addedPoints[i].x =  (automation.lineRenderer.points.Length + i) * automation.spacingX
+                addedPoints[i].y = automation.lineRenderer.points[automation.lineRenderer.points.Length-1].y
             automation.lineRenderer.points += addedPoints
         else:
             automation.lineRenderer.points = automation.lineRenderer.points[noteSectionRectTransform.rect.width:]
 
+
     def AddLength(length as int, direciton as Vector2):
         print("add: " + length)
-        canvasButton.sizeDelta.x += length / 16
-        /*resizeButtonRight.anchoredPosition.x += length / 16*/
 
         if direciton == Vector2.right:
             if length > 0:
+                if noteSectionRectTransform.sizeDelta.x < (sectionLength + length) / 16:
+                    noteSectionRectTransform.sizeDelta.x += length / 16
+
                 newLength = notes.GetLength(0) + length
+                sectionLength = newLength
+                canvas.sizeDelta.x = newLength
+                canvasButton.sizeDelta.x = newLength
                 newNotes = matrix(single, newLength, maxNotes)
 
                 for x in range(notes.GetLength(0)):
@@ -280,10 +289,11 @@ public class NoteSection (MonoBehaviour):
                         newNotes[x,y] = notes[x,y]
                 notes = newNotes
 
-                noteSectionRectTransform.sizeDelta.x += length / 16
                 loopButtonRight.anchoredPosition.x = 0
 
-                automation.lineRenderer.points += array(Vector2, length/16)
+                for grid in grids:
+                    grid.DrawGrid()
+
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -390,13 +400,13 @@ public class NoteSection (MonoBehaviour):
         startPosition = transform.localPosition
 
     def EndDrag():
+        startMouse = Vector2.zero
         desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
         transform.localPosition = desirablePosition
         /*transform.localPosition = musicScore.FindAvailableSpace(self,
                                 desirablePosition.x,
                                 desirablePosition.y,
                                 noteSectionRectTransform.sizeDelta.x)*/
-        startMouse = Vector2.zero
 
     def NumberOfNotes() as int:
         i as int = 0
