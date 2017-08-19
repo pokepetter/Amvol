@@ -398,11 +398,14 @@ public class NoteSection (MonoBehaviour):
         # print("begin drag")
         startMouse = Input.mousePosition - transform.position
         startPosition = transform.localPosition
+        canMoveStuff = true
 
     def EndDrag():
         startMouse = Vector2.zero
-        desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))
-        transform.localPosition = desirablePosition
+        /*desirablePosition = Vector2(Mathf.Clamp(startPosition.x + deltaMouse.x, 0, 90), Mathf.Clamp(startPosition.y + deltaMouse.y, 0, 44))*/
+        canMoveStuff = false
+        /*print('drop at:' + desirablePosition)*/
+        /*transform.position = desirablePosition*/
         /*transform.localPosition = musicScore.FindAvailableSpace(self,
                                 desirablePosition.x,
                                 desirablePosition.y,

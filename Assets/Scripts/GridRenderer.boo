@@ -19,6 +19,7 @@ class GridRenderer (MonoBehaviour):
     def Awake():
         rectTransform = gameObject.GetComponent(RectTransform)
         lineRenderer = gameObject.AddComponent(UILineRenderer)
+        lineRenderer.raycastTarget = false
         lineRenderer.color = gridColor
         DrawGrid()
 
@@ -45,10 +46,11 @@ class GridRenderer (MonoBehaviour):
             if spacingY == 0:
                 spacingY = height
 
-            for y in range(height, 0, -spacingY):
+            points.Add(Vector2(width * spacingX, height * spacingY))
+            for y in range(0, height, spacingY):
                 points.Add(Vector2(width*spacingX, y))
                 points.Add(Vector2(0, y))
-                points.Add(Vector2(0, (y)-spacingY))
+                points.Add(Vector2(0, (y)+spacingY))
 
             lineRenderer.points = points.ToArray()
 

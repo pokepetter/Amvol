@@ -125,6 +125,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if newZoom <= 2:
             currentNoteSection.canMoveStuff = true
             currentNoteSection.canvasButton.GetComponent(Button).enabled = false
+            currentNoteSection.canvasButton.GetComponent(Image).enabled = false
             currentNoteSection.handles.gameObject.SetActive(true)
             currentNoteSection.loopGrid.gameObject.SetActive(true)
             currentNoteSection.scrollRect.enabled = false
@@ -137,6 +138,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                 print(originalCanvasPosition)
             currentNoteSection.canMoveStuff = false
             currentNoteSection.canvasButton.GetComponent(Button).enabled = true
+            currentNoteSection.canvasButton.GetComponent(Image).enabled = true
             currentNoteSection.handles.gameObject.SetActive(false)
             currentNoteSection.loopGrid.gameObject.SetActive(false)
             currentNoteSection.scrollRect.enabled = true
