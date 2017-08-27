@@ -110,49 +110,52 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     private originalCanvasPosition as Vector2
 
     def ZoomCanvas(newZoom as int):
-        print("ZoomCanvas " + newZoom)
+        /*print("ZoomCanvas " + newZoom)*/
         if newZoom < 0:
             newZoom = 0
         elif newZoom > zoomLevels.Length:
             newZoom = zoomLevels.Length
         currentZoom = newZoom
 
-
         canvasButton.transform.localScale = zoomLevels[newZoom][0]
-        for i in range(zoomLevels.Length-4):
-            currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
+        if currentNoteSection != null:
+            for i in range(zoomLevels.Length-4):
+                currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
 
-        if newZoom <= 2:
-            currentNoteSection.canMoveStuff = true
-            currentNoteSection.canvasButton.GetComponent(Button).enabled = false
-            currentNoteSection.canvasButton.GetComponent(Image).enabled = false
-            currentNoteSection.handles.gameObject.SetActive(true)
-            currentNoteSection.loopGrid.gameObject.SetActive(true)
-            currentNoteSection.scrollRect.enabled = false
-            currentNoteSection.zoomOutButton.SetActive(false)
-            currentNoteSection.outline.enabled = true
-            DerpLerp.MoveLocal(canvasButton.transform, originalCanvasPosition, 0.1f)
-        else:
-            if currentNoteSection.canMoveStuff:
-                originalCanvasPosition = canvasButton.transform.localPosition
-                print(originalCanvasPosition)
-            currentNoteSection.canMoveStuff = false
-            currentNoteSection.canvasButton.GetComponent(Button).enabled = true
-            currentNoteSection.canvasButton.GetComponent(Image).enabled = true
-            currentNoteSection.handles.gameObject.SetActive(false)
-            currentNoteSection.loopGrid.gameObject.SetActive(false)
-            currentNoteSection.scrollRect.enabled = true
-            currentNoteSection.zoomOutButton.SetActive(true)
-            currentNoteSection.outline.enabled = false
-
-            DerpLerp.MoveLocal(canvasButton.transform, Vector2(
-                (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
-                (-currentNoteSection.transform.localPosition.y + .25) * canvasButton.transform.localScale.y),
-                0.1f)
+            if newZoom <= 2:
+                currentNoteSection.canMoveStuff = true
+                currentNoteSection.canvasButton.GetComponent(Button).enabled = false
+                currentNoteSection.canvasButton.GetComponent(Image).enabled = false
+                currentNoteSection.handles.gameObject.SetActive(true)
+                currentNoteSection.loopGrid.gameObject.SetActive(true)
+                currentNoteSection.scrollRect.enabled = false
+                currentNoteSection.zoomOutButton.SetActive(false)
+                currentNoteSection.outline.enabled = true
+                NoteSizeSetter.noteSizeSetter.gameObject.SetActive(false)
+                DerpLerp.MoveLocal(canvasButton.transform, originalCanvasPosition, 0.1f)
+            else:
+                if currentNoteSection.canMoveStuff:
+                    originalCanvasPosition = canvasButton.transform.localPosition
+                    /*print(originalCanvasPosition)*/
+                currentNoteSection.canMoveStuff = false
+                currentNoteSection.canvasButton.GetComponent(Button).enabled = true
+                currentNoteSection.canvasButton.GetComponent(Image).enabled = true
+                currentNoteSection.handles.gameObject.SetActive(false)
+                currentNoteSection.loopGrid.gameObject.SetActive(false)
+                currentNoteSection.scrollRect.enabled = true
+                currentNoteSection.zoomOutButton.SetActive(true)
+                currentNoteSection.outline.enabled = false
+                NoteSizeSetter.noteSizeSetter.gameObject.SetActive(true)
 
 
-            currentNoteSection.canvasButton.GetChild(newZoom-3).gameObject.SetActive(true)
-            NoteSizeSetter.noteSizeSetter.noteSize = noteSizes[newZoom]
+                DerpLerp.MoveLocal(canvasButton.transform, Vector2(
+                    (-currentNoteSection.transform.localPosition.x + 4) * canvasButton.transform.localScale.x,
+                    (-currentNoteSection.transform.localPosition.y + .25) * canvasButton.transform.localScale.y),
+                    0.1f)
+
+
+                currentNoteSection.canvasButton.GetChild(newZoom-3).gameObject.SetActive(true)
+                NoteSizeSetter.noteSizeSetter.noteSize = noteSizes[newZoom]
 
         currentZoom = newZoom
 
@@ -349,6 +352,19 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                 Mathf.FloorToInt(cursor.localPosition.y / 4) * 4)
             CreateNoteSection(roundedPos, 64)
         lastTimeClicked = Time.time
+
+
+    public def PlayFromCurrentNoteSection():
+        if currentNoteSection != null:
+            x = currentNoteSection.transform.localPosition.x * 16 / canvasButton.transform.localScale.x
+            timeIndicator.localPosition.x = x * 0.0625f
+            cursor.localPosition = Vector3(timeIndicator.localPosition.x, currentNoteSection.transform.localPosition.y / canvasButton.transform.localScale.y)
+            Play()
+
+    public def PlayCurrentNoteSectionSolo():
+        if currentNoteSection != null:
+            currentNoteSection.Play()
+
 
     public def CreateMetronomeNoteSection(position as Vector2, startLength as int) as NoteSection:
         metronomeNoteSection = CreateNoteSection(position, startLength)
