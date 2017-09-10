@@ -34,6 +34,7 @@ ehthumbs.db
 Builds
 Midi/
 AudioClips/
+InstrumentSources/*
 Instruments/*
 !Instruments/0DefaultPiano_n0_f500.wav
 !Instruments/0DefaultPiano_n12.wav

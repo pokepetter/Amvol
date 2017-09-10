@@ -24,9 +24,9 @@ class Metronome (MonoBehaviour):
         noteSection.instrument = instrument
         noteSection.loops = 100
         instrument.audioClips[0] = audioSource.clip
-        /*for x in range(0, 64, 16):
+        for x in range(0, 64, 16):
             for i in range(8):
-                noteSection.SetNote(x+i, 16, 1f)*/
+                noteSection.SetNote(x+i, 16, 1f)
 
 
     def Update():
