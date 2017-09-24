@@ -14,6 +14,10 @@ public class SaveSystem (MonoBehaviour):
     private tex as Texture2D
     private rect as Rect
     private bytes as (byte)
+    private data as (byte)
+    private noteCache as (single)
+    private pointer as int
+    private returnValue as uint
     private x as int
     private y as int
     private audioClip as AudioClip
@@ -28,6 +32,8 @@ public class SaveSystem (MonoBehaviour):
               Load(Environment.GetCommandLineArgs()[1])
           except:
               pass
+
+        noteCache = array(single, 256)
 
     public def Save(filePath as string):
         tex = Texture2D.blackTexture
@@ -284,102 +290,153 @@ public class SaveSystem (MonoBehaviour):
 
     
 
-    public def LoadMid(path as string):
-        bytes as (byte)= File.ReadAllBytes(path)
-        noteSection = Amvol.GetMusicScore().CreateNoteSection(Vector2.zero, 1000)
-        noteSection.transform.localPosition = Vector2.zero
+    public def LoadMidi(path as string):
+        
 
-        i as int = 0
-        cumNoteTime as single = 0
-        cumTempoTime as int = 0
+        data = File.ReadAllBytes(path)
+        pointer = 0
+        if read_int(4) != Convert.ToInt32(0x4D546864):
+            print('invalid file')
+            return false
+        header_size = read_int(4)
+        print('header_size: ' + header_size)
+        format_type = read_int(2)
+        print('format_type: '+ format_type)
+        tracks = read_int(2) - 1
+        print('tracks: '+ tracks)
+        time_division_byte_0 = read_int(1)
+        time_division_byte_1 = read_int(1)
 
-        trackLengthInfo as string = "MTrk"
-        noteOnMessage as byte = 0x90
-        noteOffMessage as byte = 0x80
-        tempoChange as (byte) = array(byte, (0xff, 0x51, 0x03))
-        deltaTime as int
-        n as int
+        if time_division_byte_0 >= 128:
+            time_division_list = (0,0)
+            time_division_list[0] = time_division_byte_0 - 128
+            time_division_list[1] = time_division_byte_1
+            print('time_division ppq: '+ time_division_list)
+        else:
+            time_division = (time_division_byte_0 * 256) + time_division_byte_1
+            print('time_division fps: '+ time_division + '\n')
 
-        while i < bytes.Length:
-            if bytes[i] == noteOnMessage:
+        for t in range(tracks+1):
+            if read_int(4) != Convert.ToInt32(0x4D54726B):
+                print(read_int(4) + ', invalid')
+                break
 
-                if bytes[i-1] != 0x00:
-                    cumNoteTime += (bytes[i-2] - bytes[i-1] + 1) /8
+            newNoteSection = musicScore.CreateNoteSection(musicScore.cursor.localPosition, 10000)
+            for e in noteCache:
+                e = 0
+            x = 0
+            notes = 0
+            hasSetBMP = false
+            Amvol.GetScaleChanger().SetScale("111111111111")
 
-                noteList as List of int = List [of int]()
-                velocityList as List of int = List [of int]()
+            chunk_length = read_int(4)
+            print('chunk_length: ' + chunk_length)
+            for i in range(data.Length):
+                delta_time = read_int_vlv()
+                //64th note = 0.015625
+                dt as single = delta_time
+                delta_time = Mathf.RoundToInt(dt / time_division / 4f / 0.015625f)
 
-                noteList.Add(bytes[i+1])
-                velocityList.Add(bytes[i+2])
-                e as int = 3
-                while e < 16:
-                    if bytes[i+e] == 0x00:
-                        noteList.Add(bytes[i+e+1])
-                        velocityList.Add(bytes[i+e+2])
-                        e += 3
-                    else:
-                        break
-
-                n = 0
-                while n < noteList.Count:
-                    for j in range((bytes[i+e] - bytes[i+e+1] + 1) /8):
-                        cumNoteTime++
-                        noteSection.SetNote(cumNoteTime-1, noteList[n]-24, velocityList[n] /127f)
-                    if n < noteList.Count-1:
-                        cumNoteTime -= (bytes[i+e] - bytes[i+e+1] + 1) /8
-                    n++
-  
-
-            if bytes[i] == noteOffMessage:
-                noteListOff as List of int = List [of int]()
-
-                noteListOff.Add(bytes[i+1])
-                o as int = 3
-                while o < 16:
-                    if bytes[i+o] != 0x00 and bytes[i+o+1] != 0x90:
-                        cumNoteTime += (bytes[i+o] - bytes[i+o+1] + 1) /8
-                        break
-                    else:
-                        o += 3
-                
-
-                # o as int = 3
-                # for j in range(16):
-                #     if bytes[i+o] != 0x00 and bytes[i+o+1] != 0x90:
-                #         cumNoteTime = cumNoteTime + ((bytes[i+o] - bytes[i+o+1] + 1) /8)
-                #         print(bytes[i+o] +" / "+ bytes[i+o+1])
-                #         break
-                #     else:
-                #         o += 3
-                        
-
-
-            if bytes[i] == tempoChange[0] and bytes[i+1] == tempoChange[1] and bytes[i+2] == tempoChange[2]:
-                tempoBytesDecimal as int = bytes[i+3] << 16 + bytes[i+4] << 8 + bytes[i+5]
-                newBPM as int = 60000000f/tempoBytesDecimal
-                cumTempoTime += bytes[i]
-                if cumTempoTime == 0:
-                    Amvol.GetMusicScore().SetBPM(newBPM)
-                    
+                status_byte = read_int(1)
+                laststatus_byte = 0
+                if status_byte >= 128:
+                    laststatus_byte = status_byte
                 else:
-                    Amvol.GetMusicScore().CreateTempoMarker(((cumTempoTime/64)-3) * 8, newBPM)
-                # print(((cumTempoTime/64)-3) + " set bpm to " + newBPM)
-                # print(60000000f/tempoBytesDecimal)
+                    status_byte = laststatus_byte
+                    pointer -= 1
 
-            i++
+                event_types = List of int()
+                event_meta_types = List of int()
+                b as byte = 0xFF
+                if status_byte == b:
+                    event_types.Add(Convert.ToInt32(0xFF))
+                    meta_type = read_int(1)
+                    event_meta_types.Add(meta_type)
+                    event_length = read_int_vlv()
+                    if meta_type == Convert.ToInt32(0x2F):
+                        print('end')
+                        break
+                    elif meta_type == Convert.ToInt32(0x06):
+                        print('marker: '+ read_int(event_length))
+                    elif meta_type == Convert.ToInt32(0x51):
+                        tempo = read_int(event_length)
+                        # micro seconds per quarter note
+                        bpm = tempo * 60 * 4 / 1000000
+                        print('set bpm: '+ bpm)
+                        if not hasSetBMP:
+                            musicScore.SetBPM(bpm)
+                            hasSetBMP = true
+                        else:
+                            print("todo: create tempo marker")
+                    elif meta_type == Convert.ToInt32(0x58):
+                        time_signature = read_int(1).ToString() + '/' + Mathf.Pow(2, read_int(1)).ToString()
+                        pointer += 1
 
-    # private def CreateNote(noteLength as (byte)):
-    #     if noteLength[0] == 0x87 and noteLength[1] == 0x68:
-    #         for j in range(8):
-    #             cumNoteTime++
-    #             noteCanvas.SetNote(cumNoteTime-1, bytes[i+1]-24, bytes[i+2] /100f)
-    #     if bytes[i+3] == 0x83 and bytes[i+4] == 0x74:
-    #         for j in range(4):
-    #             cumNoteTime++
-    #             noteCanvas.SetNote(cumNoteTime-1, bytes[i+1]-24, bytes[i+2] /100f)
+                        print('time signature: '+ time_signature)
+                    else:
+                        pointer += event_length
+                        print('other: '+ read_int(event_length))
 
-    #     if bytes[i+3] == 0x81 and bytes[i+4] == 0x7a:
-    #         for j in range(2):
-    #             cumNoteTime++
-    #             noteCanvas.SetNote(cumNoteTime-1, bytes[i+1]-24, bytes[i+2] /100f)
+                elif status_byte:
+                    status_byte_byte as string = status_byte.ToString("X")
+                    if status_byte_byte.StartsWith('F'):
+                        event_length = read_int_vlv()
+                        pointer += event_length
+                        break
+                    elif status_byte_byte.StartsWith('8'):
+                        noteIndex = read_int(1)
+                        volume = noteCache[noteIndex]
+                        for j in range(delta_time):
+                            newNoteSection.SetNote(x-j, noteIndex, volume)
+                        print(x + ', ' + 'note off: ' + noteIndex + ', ' + volume)
+                    elif status_byte_byte.StartsWith('9'):
+                        noteIndex = read_int(1)
+                        volume = read_int(1) / 127f
+                        noteCache[noteIndex] = volume
+                        newNoteSection.SetNote(x-1, noteIndex, 0f)
+                        notes += 1
+                        print(x + ', ' + 'note on: '+ noteIndex + ', ' + volume)
+                    elif status_byte_byte.StartsWith('D'):
+                        pointer += 1
 
+                    
+                    x += delta_time
+
+            if notes == 0:
+                musicScore.noteSections.Remove(newNoteSection)
+                Destroy(newNoteSection)
+
+    def read_int(length as uint):
+        returnValue = 0
+        if length > 1:
+            for i in range(1, length):
+                try:
+                    returnValue += data[pointer] * Mathf.Pow(256, (length - i))
+                except:
+                    print('overflow')
+                pointer += 1
+
+        returnValue += (data[pointer])
+        pointer += 1
+        return (returnValue)
+
+    def read_int_vlv():
+        returnValue = 0
+        if((data[pointer])) < 128:
+            returnValue = read_int(1)
+        else:
+            pieces = List of int()
+            while (data[pointer]) >= 128:
+                pieces.Add(read_int(1) - 128)
+            last_byte = read_int(1)
+            dt = 1
+            while dt <= pieces.Count-1:
+                returnValue = pieces[pieces.Count-1 - dt] * Mathf.Pow(128, dt)
+                dt += 1
+            returnValue += last_byte
+        return returnValue
+
+    def Update():
+        if Input.GetKeyDown(KeyCode.P):
+
+            LoadMidi("E:\\UnityProjects\\Amvol\\Midi\\midiFileTest2.mid")

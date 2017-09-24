@@ -23,6 +23,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     public wholeNoteGrid as Transform
     public wholeNoteGridRenderer as GridRenderer
     public beatTime as single
+    public BPMIndicator as Text
 
     private k as int = 0
 
@@ -325,6 +326,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public def SetBPM(newBPM as int):
         beatTime = 3.75f / newBPM
+        if BPMIndicator.text != beatTime.ToString():
+            BPMIndicator.text = beatTime.ToString()
         print("set BPM to " + newBPM + ", beatTime: " + 3.75f / newBPM)
 
     public def CreateTempoMarker(x as int, newTempo as int):
@@ -363,7 +366,10 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
     public def PlayCurrentNoteSectionSolo():
         if currentNoteSection != null:
-            currentNoteSection.Play()
+            if not currentNoteSection.playing:
+                currentNoteSection.Play()
+            else:
+                currentNoteSection.Stop()
 
 
     public def CreateMetronomeNoteSection(position as Vector2, startLength as int) as NoteSection:

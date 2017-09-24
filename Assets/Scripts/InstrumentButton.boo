@@ -100,5 +100,5 @@ public class InstrumentButton (MonoBehaviour):
 
         musicScore = Amvol.GetMusicScore()
         for nS in musicScore.noteSections:
-            if nS.instrument == iL[0].transform.GetComponent(Instrument):
+            if nS != null and nS.instrument == iL[0].transform.GetComponent(Instrument):
                 nS.GetComponent(Image).color = color

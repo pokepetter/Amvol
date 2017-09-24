@@ -145,7 +145,7 @@ public class FileBrowser (MonoBehaviour):
         if currentDirectory.Substring(currentDirectory.Length-4) == ".png":
             Amvol.GetSaveSystem().Load(currentDirectory)
         if currentDirectory.Substring(currentDirectory.Length-4) == ".mid":
-            Amvol.GetSaveSystem().LoadMid(currentDirectory)
+            Amvol.GetSaveSystem().LoadMidi(currentDirectory)
         # if currentFileType == "instrument":
 
         else:

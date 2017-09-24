@@ -104,6 +104,7 @@ class Instrument (MonoBehaviour):
         aS.spatialBlend = targetAudioSource.spatialBlend
         aS.spread = targetAudioSource.spread
         aS.volume = 0f
+        aS.panStereo = pan
         if aS.loop:
             aS.pitch = lastPitch
         else:
@@ -143,6 +144,9 @@ class Instrument (MonoBehaviour):
             
     def SetPan(newPan as single):
         pan = newPan
+
+    def SetLegatoSpeed(newLegatoSpeed as single):
+        legatoSpeed = newLegatoSpeed
 
     def SetAttack(newAttack as single):
         attack = newAttack

@@ -132,7 +132,9 @@ public class NoteSection (MonoBehaviour):
                     x = 0
                     y = 0
                     loopsLeft -= 1f
-                    if loopsLeft <= 0f:
+                    if NoteSizeSetter.noteSizeSetter.gameObject.activeSelf and NoteSizeSetter.noteSizeSetter.repeatNoteSection:
+                        loopsLeft += 1f
+                    elif loopsLeft <= 0f:
                         Stop()
             else:
                 if x >= sectionLength * loopsLeft:
@@ -160,6 +162,7 @@ public class NoteSection (MonoBehaviour):
         stopButton.SetActive(true)
         playButton.SetActive(false)
         playing = true
+        NoteSizeSetter.noteSizeSetter.stopButton.SetActive(true)
         InvokeRepeating("NextTimeStep", 0, musicScore.beatTime)
 
 
@@ -176,6 +179,7 @@ public class NoteSection (MonoBehaviour):
             connectedNotes.Clear()
             for i in range(128):
                 StopPlayingNote(i)
+            NoteSizeSetter.noteSizeSetter.stopButton.SetActive(false)
         except:
             pass //destroyed
 
