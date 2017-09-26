@@ -41,23 +41,23 @@ class Instrument (MonoBehaviour):
 
         originalGUIHeight = layoutElement.preferredHeight
 
-    def Update():
-        if Input.GetKey(KeyCode.Keypad2):
-            legatoSpeed = 5f
-        elif Input.GetKey(KeyCode.Keypad3):
-            legatoSpeed = 10f
-        elif Input.GetKey(KeyCode.Keypad4):
-            legatoSpeed = 20f
-        elif Input.GetKeyDown(KeyCode.Keypad5):
-            legatoSpeed = 50f
-        elif Input.GetKey(KeyCode.Keypad6):
-            legatoSpeed = 100f
-        elif Input.GetKey(KeyCode.Keypad7):
-            legatoSpeed = 150f
-        elif Input.GetKey(KeyCode.Keypad8):
-            legatoSpeed = 200f
-        else:
-            legatoSpeed = 50
+    # def Update():
+    #     if Input.GetKey(KeyCode.Keypad2):
+    #         legatoSpeed = 5f
+    #     elif Input.GetKey(KeyCode.Keypad3):
+    #         legatoSpeed = 10f
+    #     elif Input.GetKey(KeyCode.Keypad4):
+    #         legatoSpeed = 20f
+    #     elif Input.GetKeyDown(KeyCode.Keypad5):
+    #         legatoSpeed = 50f
+    #     elif Input.GetKey(KeyCode.Keypad6):
+    #         legatoSpeed = 100f
+    #     elif Input.GetKey(KeyCode.Keypad7):
+    #         legatoSpeed = 150f
+    #     elif Input.GetKey(KeyCode.Keypad8):
+    #         legatoSpeed = 200f
+    #     else:
+    #         legatoSpeed = 50
 
 
     def SetAudioClips(newAudioClips as (AudioClip), notes as (int)):
