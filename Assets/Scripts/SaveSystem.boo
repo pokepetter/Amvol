@@ -43,12 +43,10 @@ public class SaveSystem (MonoBehaviour):
         if noteSections.Count == 0:
             print('nothing to save')
         else:
-            endPoint = 0
+            width = 0
             for noteSection in noteSections:
-                if noteSection.transform.localPosition.x + noteSection.transform.GetComponent(RectTransform).sizeDelta.x > endPoint:
-                    endPoint = noteSection.transform.localPosition.x + noteSection.transform.GetComponent(RectTransform).sizeDelta.x
-            width = endPoint * 8
-            print(width)
+                if noteSection.transform.localPosition.x * 16 + (noteSection.sectionLength * noteSection.loops) > width:
+                    width = noteSection.transform.localPosition.x * 16 + (noteSection.sectionLength * noteSection.loops)
 
             lastNoteSection = noteSections[0]
             for noteSection in noteSections:
@@ -90,7 +88,7 @@ public class SaveSystem (MonoBehaviour):
         for noteSection in noteSections:
             x = 0
             y = 1
-            posX = noteSection.transform.localPosition.x * 8
+            posX = noteSection.transform.localPosition.x * 16
 
             //start section
             print("note section start: " + Vector2(posX, (noteSection.transform.localPosition.y * 32) +2))
@@ -111,20 +109,18 @@ public class SaveSystem (MonoBehaviour):
                 tex.SetPixel(posX + 3, (noteSection.transform.localPosition.y * 32) +2, Color(noteSection.loops - Mathf.FloorToInt(noteSection.loops), 0, 0))
 
             //end section
-            tex.SetPixel(((noteSection.transform.localPosition.x * 8) + noteSection.transform.GetComponent(RectTransform).sizeDelta.x * 8) -1, (noteSection.transform.localPosition.y * 32) +2, Color.blue)
+            tex.SetPixel(((noteSection.transform.localPosition.x * 16) + noteSection.sectionLength) -1, (noteSection.transform.localPosition.y * 32) +2, Color.blue)
             
             //save notes
-            while y < 128 and x < noteSection.sectionLength:
-                tex.SetPixel((noteSection.transform.localPosition.x * 32) + x, (noteSection.transform.localPosition.y * 32) + y +2, Color(noteSection.notes[x,y], 0, 0))
-                y++
-                if y == 128:
-                    y = 1
-                    x++
+            for x in range(noteSection.sectionLength):
+                for y in range(1, 128):
+                    tex.SetPixel(x + noteSection.transform.localPosition.x * 16, (noteSection.transform.localPosition.y * 32) + y +2, Color(noteSection.notes[x,y], 0, 0))
+
 
             //save volume automation
             for i in range(noteSection.automation.lineRenderer.points.Length-1):
                 point = noteSection.automation.lineRenderer.points[i]
-                x = noteSection.transform.localPosition.x * 32 + (i * 8)
+                x = noteSection.transform.localPosition.x * 32 + (i * 16)
                 y = (noteSection.transform.localPosition.y * 32) + 3 + (point.y / noteSection.noteSectionRectTransform.rect.height * 127)
                 # print(y)
 
@@ -145,19 +141,6 @@ public class SaveSystem (MonoBehaviour):
 
         bytes += instrumentBytes
 
-        # imageData = File.ReadAllBytes(Application.dataPath + "/" + filePath + ".png")
-
-        # firstPart = bytes.Take(29).ToArray()
-        # lastPart = bytes.Skip(37).Take(bytes.Length-37).ToArray()
-
-        # //add instrument names to comment
-        # instrumentInfo = ".tEXtComment" + Char.Parse("\0") + "Instruments: "
-        # for instrument in instrumentChanger.instruments:
-        #     instrumentInfo += instrument.gameObject.name + ", "
-        # instrumentInfo += "1™½ò" + Char.Parse("\0") + Char.Parse("\0") + Char.Parse("\0") + ""
-        # middlePart = Encoding.UTF8.GetBytes(instrumentInfo)
-        
-        # bytes  = firstPart + middlePart + lastPart
 
         print("saved to " + filePath)
         File.WriteAllBytes(filePath, bytes)
@@ -242,16 +225,19 @@ public class SaveSystem (MonoBehaviour):
                                 break
 
 
-                        noteSection = musicScore.CreateNoteSection(Vector2(w /8, Mathf.FloorToInt((h-2)/32)), noteSectionLength)
+                        noteSection = musicScore.CreateNoteSection(Vector2(w /16, Mathf.FloorToInt((h-2)/32)), noteSectionLength)
                         instIndex as Color32 = tex.GetPixel(w+1, h)
-                        print(instIndex.r)
+                        # print(instIndex.r)
                         noteSection.UpdateInstrument(instrumentChanger.instruments[instIndex.r])
                         //find number of loops
                         wholeLoops as Color32 = tex.GetPixel(startPosition+2, h)
                         noteSection.loops = wholeLoops.g
                         //partial loops
                         noteSection.loops += tex.GetPixel(startPosition+3, h).g
+                        noteSection.noteSectionRectTransform.sizeDelta.x = noteSectionLength * noteSection.loops /16
+                        noteSection.CalculateLoops()
 
+                        //set notes
                         for x in range(noteSectionLength):
                             for y in range(128):
                                 noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)
@@ -260,13 +246,16 @@ public class SaveSystem (MonoBehaviour):
                         # yield null
                         yield WaitForSeconds(0.1f)
                         lineHeight = Color32()
-                        for x in range(startPosition, startPosition + (noteSectionLength*noteSection.loops), 8):
-                            for y in range(h, 127+3):
+                        for x in range(0, noteSectionLength * noteSection.loops, 16):
+
+                            for y in range(h+1, h+1+127):
                                 lineHeight = tex.GetPixel(x,y)
                                 if lineHeight.g > 0f:
-                                    # print((y-h) / 127f)
-                                    noteSection.automation.lineRenderer.points[x/8].y = (y-h) / 127f * noteSection.noteSectionRectTransform.rect.height
-                                    print(noteSection.automation.lineRenderer.points[x/8].y)
+                                    print("x: " + x/16 + " => " + y)
+                                    try:
+                                        noteSection.automation.lineRenderer.points[x/16].y = (y-h) / 127f * noteSection.noteSectionRectTransform.rect.height
+                                    except:
+                                        print("automation error")
                                     break
 
 

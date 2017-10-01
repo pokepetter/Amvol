@@ -1,46 +1,61 @@
-﻿import UnityEngine
-# import UnityEditor
-import System.Collections
+import UnityEngine
+import System.Math
 
-class Synth (MonoBehaviour): 
-    
-    public position as single = 0f
-    public samplerate as single = 44100f
-    public frequency as single= 440f
-    public amplitude as single = 1f
-    private i as int = 0
-    private hasRecorded as bool
-    private allDataSources as (single)
-    private aud as AudioSource
-    public curve as AnimationCurve
+public class Synth (MonoBehaviour):
+      // un-optimized version
+    public frequency as single = 220
+    public gain as single = 0.05
+    public vibrato as single
+    public vibratoSpeed as single = 20f
+    public volume as AnimationCurve
+    public waveOffset as AnimationCurve
+    public pitchOffset as AnimationCurve
+    public leftRight as AnimationCurve
 
-    def Start():
-        allDataSources = array(single, 0)
-        myClip as AudioClip = AudioClip.Create("Synth", samplerate * 2, 1, samplerate, true, OnAudioRead, OnAudioSetPosition)
-        aud = GetComponent(AudioSource)
-        aud.clip = myClip
-        aud.Play()
+    public indicator as RectTransform
 
-    
-    def OnAudioRead(data as (single)):
-        i = 0
-        while i < data.Length:
-            data[i] = Mathf.Sin(position * frequency) * amplitude
-            position++
-            i++
-        allDataSources += data
+    private increment as single
+    private phase as single
+    private sampling_frequency as single = 44100
+    public t as single
+    private originalFrequency as single
 
-    def OnAudioSetPosition(newPosition as int):
-        position = newPosition
+    def Awake():
+        originalFrequency = frequency
+        t = 0
+
+
+    def OnAudioFilterRead(data as (single), channels as int):
+        t++
+        print(t)
+        /*return*/
+        // update increment in case frequency has changed
+        increment = frequency * 2 * Math.PI / sampling_frequency
+        for i in range (data.Length):
+            phase += increment
+            /*print(frequency / sampling_frequency)*/
+            /*gain *= volume.Evaluate((i / data.Length))*/
+            frequency = originalFrequency + (Mathf.Sin(t * vibratoSpeed * 0.01f) * vibrato)
+            data[i] = gain*Math.Sin(phase)
+        // if we have stereo, we copy the mono data to each channel
+          /*if channels == 2:
+            data[i + 1] = data[i];*/
+            if phase > 2 * Math.PI:
+                phase = 0
 
     def Update():
-        amplitude = curve.Evaluate(Time.time * 0.1f)
-        transform.position.y = Mathf.Sin((Time.fixedTime * 0.1f) * frequency) * amplitude
+        if Input.GetKeyDown(KeyCode.W):
+            originalFrequency = 110f
+            StartCoroutine(LerpRoutine())
+        if Input.GetKeyDown(KeyCode.E):
+            originalFrequency = 220f
+            StartCoroutine(LerpRoutine())
 
 
-
-    # class SynthEditor (Editor):
-    #     curve as AnimationCurve = AnimationCurve.Linear(0,0,10,10)
-
-    #     def OnGUI():
-    #         curve = EditorGUILayout.CurveField(curve)
+    def LerpRoutine() as IEnumerator:
+        gain = .5f
+        vibratoSpeed = 0f
+        for i in range(50):
+            yield WaitForSeconds(0.1f)
+            gain += (.5f / 50f)
+            vibratoSpeed += 1f

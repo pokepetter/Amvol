@@ -8,6 +8,7 @@ class Instrument (MonoBehaviour):
     public pan as single
     public attack as single = 0
     public falloff as single = 6
+    public attackSoftening as single = 1
     public isDrumSet as bool
     public instrumentColor as Color
 

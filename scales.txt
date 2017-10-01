@@ -2,6 +2,8 @@
 111111111111,normal
 111111111112,skip one
 2212221,Heptatonic
+2122122,Natural minor
+2122212,Dorian
 222222,Whole tone
 32232,Minor pentatonic
 22323,Major pentatonic

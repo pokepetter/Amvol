@@ -10,14 +10,17 @@ class Note (MonoBehaviour):
     public noteNumber as int
     public originalVolume as single
 
+    private attackSoftening as single
     private isStopping as bool
 
     public def Play(newVolume as single):
         # print("play")
         if audioLerper == null:
             print("audioLerper is null")
-        audioLerper.LerpVolume(0, instrument.falloff)
-        audioLerper.LerpVolume(newVolume, instrument.attack)
+        # audioLerper.LerpVolume(0, instrument.falloff)
+        attackSoftening = instrument.attackSoftening * (instrument.attack * (1-newVolume))
+
+        audioLerper.LerpVolume(newVolume, instrument.attack + attackSoftening)
         audioSource.Play()
 
     public def Stop():
