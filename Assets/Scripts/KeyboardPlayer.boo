@@ -6,6 +6,8 @@ class KeyboardPlayer (MonoBehaviour):
 
     public pianoRoll as Transform
     public noteOverlay as GameObject
+    public noteOverlay1 as GameObject
+    public noteOverlayInsideNoteSection as RectTransform
     public usingMidiKeyboard as bool = true
     public blockInput as bool
 
@@ -14,6 +16,7 @@ class KeyboardPlayer (MonoBehaviour):
     private keys as (KeyCode)
     private noteNames as (string)
     private overlays as (GameObject)
+    private overlays1 as (GameObject)
     private i as int = 0
     private j as int = 0
     private k as int
@@ -69,7 +72,7 @@ class KeyboardPlayer (MonoBehaviour):
 
 
         if usingMidiKeyboard == true:
-            while k < 128:
+            for k in range(128):
                 if MidiMaster.GetKeyDown(k):
                     /*rand = Random.Range(-1f, 1f)
                     print(rand)*/
@@ -80,6 +83,7 @@ class KeyboardPlayer (MonoBehaviour):
                         instrumentChanger.PlayNote(k+3,MidiMaster.GetKey(k))*/
 
                     overlays[k].SetActive(true)
+                    overlays1[k].SetActive(true)
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StartNote(k,MidiMaster.GetKey(k))
 
@@ -93,10 +97,7 @@ class KeyboardPlayer (MonoBehaviour):
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StopNote(k)
                     overlays[k].SetActive(false)
-                k++
-
-            if k >= 128:
-                k = 0
+                    overlays1[k].SetActive(false)
 
 
             if MidiMaster.GetKnob(7, 0f) != lastVolumeKnob:
@@ -106,30 +107,38 @@ class KeyboardPlayer (MonoBehaviour):
 
     public def InstantiateNoteOverlays():
         overlays = array(GameObject, 128)
-        k as int = 0
-        while k < 128:
+        overlays1 = array(GameObject, 128)
+        
+        for i in range(128):
             overlayElement = Instantiate(noteOverlay)
             overlayElement.transform.SetParent(pianoRoll, false)
-            overlayElement.transform.localPosition= Vector3(0,k,0)
+            overlayElement.transform.localPosition = Vector2(0, i)
             rectTransform as RectTransform = overlayElement.GetComponent(RectTransform)
             rectTransform.anchorMin = Vector2(0f, 0f)
             rectTransform.anchorMax = Vector2(1f, 0f)
-            overlays[k] = overlayElement.transform.GetChild(0).gameObject
-            k++
+            overlays[i] = overlayElement.transform.GetChild(0).gameObject
+
+            //overlays inside note section
+            overlayElement1 = Instantiate(noteOverlay1)
+            overlayElement1.transform.SetParent(noteOverlayInsideNoteSection, false)
+            # rectTransform = overlayElement1.AddComponent(RectTransform)
+            # rectTransform.anchorMin = Vector2(0f, 0f)
+            # rectTransform.anchorMax = Vector2(1f, 0f)
+
+            overlayElement1.transform.localPosition = Vector2(0, i)
+            overlays1[i] = overlayElement1
 
     public def UpdateNoteNames():
         scaleChanger = Amvol.GetScaleChanger()
         scaleLength as int = scaleChanger.GetScaleLength()
 
-        e as int = 0
-        while e < overlays.Length:
-            # print(scaleChanger.NoteOffset(e - scaleChanger.noteOffset, true) +" / ")
+        for i in range(overlays.Length):
+            # print(scaleChanger.NoteOffset(i - scaleChanger.noteOffset, true) +" / ")
 
-            if e % scaleLength == 0:
-                overlays[e].SetActive(true)
-                overlays[e].GetComponent(Image).color = Color(1,1,1,0.05)
+            if i % scaleLength == 0:
+                overlays[i].SetActive(true)
+                overlays[i].GetComponent(Image).color = Color(1,1,1,0.05)
             else:
-                overlays[e].SetActive(false)
-                overlays[e].GetComponent(Image).color = Color(0.3, 0.5, 0.7, 0.5)
-            overlays[e].transform.parent.GetChild(1).GetComponent(Text).text = noteNames[scaleChanger.NoteOffset(e, true)] + (e/scaleLength).ToString()
-            e++
+                overlays[i].SetActive(false)
+                overlays[i].GetComponent(Image).color = Color(0.3, 0.5, 0.7, 0.5)
+            overlays[i].transform.parent.GetChild(1).GetComponent(Text).text = noteNames[scaleChanger.NoteOffset(i, true)] + (i/scaleLength).ToString()

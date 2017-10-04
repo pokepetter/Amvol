@@ -14,6 +14,7 @@ public class NoteSection (MonoBehaviour):
 
     public isRecording as bool
     public canvasButton as RectTransform
+    public gridParent as RectTransform
 
     private k as int = 0
 
@@ -83,6 +84,13 @@ public class NoteSection (MonoBehaviour):
         zoomOutButton.SetActive(false)
         outline.effectDistance = Vector2.one * 0.05f
         outline.effectColor = Color.grey
+
+        grids = gridParent.transform.GetComponentsInChildren[of GridRenderer]()
+        print("grids: " + grids.Length)
+        for i in range(gridParent.childCount):
+            gridParent.GetChild(i).gameObject.SetActive(false)
+        for grid in grids:
+            grid.DrawGrid()
 
 
     def Update():
@@ -256,6 +264,7 @@ public class NoteSection (MonoBehaviour):
         noteSectionRectTransform.sizeDelta.x = length /16f
         resizeButtonRight.anchoredPosition.x = length /16f
         canvasButton.sizeDelta.x = sectionLength
+        gridParent.sizeDelta.x = sectionLength
         CalculateLoops()
 
 
@@ -286,6 +295,7 @@ public class NoteSection (MonoBehaviour):
                 sectionLength = newLength
                 canvas.sizeDelta.x = newLength
                 canvasButton.sizeDelta.x = newLength
+                gridParent.sizeDelta.x = newLength
                 newNotes = matrix(single, newLength, maxNotes)
 
                 for x in range(notes.GetLength(0)):
@@ -361,7 +371,7 @@ public class NoteSection (MonoBehaviour):
         notes = newNotes
 
         for noteBox in canvasButton.GetComponentsInChildren[of RectTransform]():
-            if noteBox.anchoredPosition.x > sectionLength and noteBox != indicator:
+            if noteBox.anchoredPosition.x > sectionLength:
                 Destroy(noteBox.gameObject)
 
         CalculateLoops()
@@ -393,6 +403,12 @@ public class NoteSection (MonoBehaviour):
         if lastTimeClicked + 0.2f > Time.time:
             musicScore.ZoomCanvas(3)
         lastTimeClicked = Time.time
+
+        noteOverlay = Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection
+        noteOverlay.parent = gridParent.parent
+        noteOverlay.anchoredPosition = Vector2.zero
+        noteOverlay.sizeDelta = gridParent.sizeDelta
+
 
     def Deselect():
         outline.effectDistance = Vector2.zero
@@ -454,5 +470,5 @@ public class NoteSection (MonoBehaviour):
                     SetNote(x, y + (distance), copy[x,y])
 
     def TransposeOctave(distance as int):
-        scaleLength = Amvol.Amvol.scaleChanger.scaleLength
+        scaleLength = Amvol.instance.scaleChanger.scaleLength
         Transpose(distance * scaleLength)

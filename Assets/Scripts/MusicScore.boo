@@ -120,8 +120,8 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
 
         canvasButton.transform.localScale = zoomLevels[newZoom][0]
         if currentNoteSection != null:
-            for i in range(zoomLevels.Length-4):
-                currentNoteSection.canvasButton.GetChild(i).gameObject.SetActive(false)
+            for i in range(canvasButton.childCount):
+                currentNoteSection.gridParent.GetChild(i).gameObject.SetActive(false)
 
             if newZoom <= 2:
                 currentNoteSection.canMoveStuff = true
@@ -155,7 +155,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
                     0.1f)
 
 
-                currentNoteSection.canvasButton.GetChild(newZoom-3).gameObject.SetActive(true)
+                currentNoteSection.gridParent.GetChild(newZoom-3).gameObject.SetActive(true)
                 NoteSizeSetter.noteSizeSetter.noteSize = noteSizes[newZoom]
 
         currentZoom = newZoom

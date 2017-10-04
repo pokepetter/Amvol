@@ -32,7 +32,7 @@ public class WavWriter (MonoBehaviour):
         
      
     def Start():
-        musicScore = Amvol.Amvol.musicScore
+        musicScore = Amvol.instance.musicScore
         AudioSettings.GetDSPBufferSize(bufferSize,numBuffers)
        
         // Make a reference to the attached audio source

@@ -47,8 +47,8 @@ class InstrumentChanger (MonoBehaviour):
     def AddInstrument() as Instrument:
         newInstrument as Instrument = Instantiate(instrumentPrefab).GetComponent(Instrument)
         newInstrument.transform.SetParent(instrumentsParent, false) 
-        addInstrumentButton.SetParent(null, false)
-        addInstrumentButton.SetParent(instrumentsParent, false)
+        # addInstrumentButton.SetParent(null, false)
+        # addInstrumentButton.SetParent(instrumentsParent, false)
         instruments.Add(newInstrument)
         SetCurrentInstrument(newInstrument)
         return newInstrument

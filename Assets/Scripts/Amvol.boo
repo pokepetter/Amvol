@@ -9,26 +9,26 @@ public class Amvol (MonoBehaviour):
     public instrumentChanger as InstrumentChanger
     public saveSystem as SaveSystem
 
-    public static Amvol as Amvol
+    public static instance as Amvol
 
     def Awake():
-        Amvol = self
+        instance = self
         Screen.SetResolution(Screen.currentResolution.width-100, Screen.currentResolution.height-100, false)
 
     public static def GetMusicScore() as MusicScore:
-        return Amvol.musicScore
+        return instance.musicScore
 
     public static def GetFileBrowser() as FileBrowser:
-        return Amvol.FileBrowser
+        return instance.FileBrowser
 
     public static def GetScaleChanger() as ScaleChanger:
-        return Amvol.scaleChanger
+        return instance.scaleChanger
 
     public static def GetKeyboardPlayer() as KeyboardPlayer:
-        return Amvol.keyboardPlayer
+        return instance.keyboardPlayer
 
     public static def GetInstrumentChanger() as InstrumentChanger:
-        return Amvol.instrumentChanger
+        return instance.instrumentChanger
 
     public static def GetSaveSystem() as SaveSystem:
-        return Amvol.saveSystem
+        return instance.saveSystem

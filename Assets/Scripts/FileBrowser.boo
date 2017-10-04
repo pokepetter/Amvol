@@ -59,17 +59,17 @@ public class FileBrowser (MonoBehaviour):
         parentDirectory = System.IO.Directory.GetParent(currentDirectory).FullName
         allFiles = System.IO.Directory.GetFileSystemEntries(currentDirectory)
         UpdateFileList(".png")
-        Amvol.Amvol.keyboardPlayer.blockInput = true
+        Amvol.instance.keyboardPlayer.blockInput = true
 
         //hacky
-        headerText = Amvol.Amvol.saveSystem.header.text
+        headerText = Amvol.instance.saveSystem.header.text
         if headerText != 'Amvol':
         	fileNameField.text = Path.GetFileName(headerText).Split(char.Parse('.'))[0]
 
 
 
     def OnDisable():
-        Amvol.Amvol.keyboardPlayer.blockInput = false
+        Amvol.instance.keyboardPlayer.blockInput = false
 
 
 

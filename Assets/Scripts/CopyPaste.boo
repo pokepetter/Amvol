@@ -8,12 +8,12 @@ public class CopyPaste (MonoBehaviour):
     private musicScore as MusicScore
 
     def Start():
-        musicScore = Amvol.Amvol.musicScore
+        musicScore = Amvol.instance.musicScore
     
     def Update():
         if Input.GetKey(KeyCode.LeftShift) and Input.GetKeyDown(KeyCode.C):
             # print(GUIUtility.systemCopyBuffer)
-            # print(Amvol.Amvol.musicScore.currentNoteSection.notes.ToString())
+            # print(Amvol.instance.musicScore.currentNoteSection.notes.ToString())
             if musicScore.currentNoteSection != null:
                 noteSection = musicScore.currentNoteSection
                 
