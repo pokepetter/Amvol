@@ -109,6 +109,9 @@ public class NoteSection (MonoBehaviour):
             automation.gameObject.SetActive(true)
 
         if Input.GetKeyUp(KeyCode.Tab):
+            if musicScore.currentZoom <= 2:
+                canMoveStuff = true
+
             if canMoveStuff:
                 handles.SetActive(true)
             automation.gameObject.SetActive(false)
@@ -273,14 +276,17 @@ public class NoteSection (MonoBehaviour):
         loops = noteSectionRectTransform.sizeDelta.x * 16 /sectionLength
         loopGrid.spacingX = sectionLength /16
         loopGrid.DrawGrid()
-        if automation.lineRenderer.points.Length < noteSectionRectTransform.rect.width:
-            addedPoints = array(Vector2, noteSectionRectTransform.rect.width - automation.lineRenderer.points.Length+1)
-            for i in range(addedPoints.Length):
-                addedPoints[i].x =  (automation.lineRenderer.points.Length + i) * automation.spacingX
-                addedPoints[i].y = automation.lineRenderer.points[automation.lineRenderer.points.Length-1].y
-            automation.lineRenderer.points += addedPoints
-        else:
-            automation.lineRenderer.points = automation.lineRenderer.points[noteSectionRectTransform.rect.width:]
+
+        oldPoints = automation.lineRenderer.points
+        newAutomationPoints = array(Vector2, noteSectionRectTransform.rect.width+1)
+
+        for i in range(newAutomationPoints.Length):
+            newAutomationPoints[i] = Vector2(i * automation.spacingX, 2)
+
+        for i in range(Mathf.Min(oldPoints.Length, newAutomationPoints.Length)):
+            newAutomationPoints[i] = oldPoints[i]
+
+        automation.lineRenderer.points = newAutomationPoints
 
 
     def AddLength(length as int, direciton as Vector2):
