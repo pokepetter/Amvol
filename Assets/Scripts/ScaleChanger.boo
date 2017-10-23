@@ -59,7 +59,7 @@ class ScaleChanger (MonoBehaviour):
 
     def NoteOffset(y as int, normalizeWithinOctave as bool) as int: //return this to the NoteSection
         if y == 0:
-            print("no note on 0")
+            # print("no note on 0")
             return 0
 
         sL as single = (y-1f) / (scaleLength)

@@ -393,7 +393,7 @@ public class SaveSystem (MonoBehaviour):
 
             if notes == 0:
                 musicScore.noteSections.Remove(newNoteSection)
-                Destroy(newNoteSection)
+                newNoteSection.Die()
 
     def read_int(length as uint):
         returnValue = 0

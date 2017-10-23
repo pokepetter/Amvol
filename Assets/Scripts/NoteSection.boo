@@ -86,7 +86,7 @@ public class NoteSection (MonoBehaviour):
         outline.effectColor = Color.grey
 
         grids = gridParent.transform.GetComponentsInChildren[of GridRenderer]()
-        print("grids: " + grids.Length)
+        # print("grids: " + grids.Length)
         for i in range(gridParent.childCount):
             gridParent.GetChild(i).gameObject.SetActive(false)
         for grid in grids:
@@ -272,7 +272,7 @@ public class NoteSection (MonoBehaviour):
 
 
     def CalculateLoops():
-        print("CalculateLoops")
+        # print("CalculateLoops")
         loops = noteSectionRectTransform.sizeDelta.x * 16 /sectionLength
         loopGrid.spacingX = sectionLength /16
         loopGrid.DrawGrid()
@@ -289,10 +289,12 @@ public class NoteSection (MonoBehaviour):
         automation.lineRenderer.points = newAutomationPoints
 
 
-    def AddLength(length as int, direciton as Vector2):
-        print("add: " + length)
+    def AddLength(length as int, direction as Vector2):
+        print("add: " + length + ", direction: " + direction)
 
-        if direciton == Vector2.right:
+        //change end
+        if direction == Vector2.right:
+            //add at end
             if length > 0:
                 if noteSectionRectTransform.sizeDelta.x < (sectionLength + length) / 16:
                     noteSectionRectTransform.sizeDelta.x += length / 16
@@ -313,7 +315,7 @@ public class NoteSection (MonoBehaviour):
 
                 for grid in grids:
                     grid.DrawGrid()
-
+            //truncate end
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -330,20 +332,28 @@ public class NoteSection (MonoBehaviour):
                 else:
                     //TODO: show warning
                     TruncateEnd(length)
-        else:
-            if length > 0:
-                newLength = length + notes.GetLength(0)
-                newNotes = matrix(single, newLength, maxNotes)
 
-                for x in range(length, notes.GetLength(0)):
-                    for y in range(notes.GetLength(1)):
-                        newNotes[x,y] = notes[x,y]
+        //change start
+        else:
+            //add to start
+            
+            if length <= 0:
+                newLength = -length + notes.GetLength(0)
+                print('add to start' + newLength)
+                newNotes = matrix(single, newLength, maxNotes)
+                sectionLength = newLength
+
+                for x in range(-length, newNotes.GetLength(0)):
+                    for y in range(maxNotes):
+                        newNotes[x,y] = notes[x+length,y]
                 notes = newNotes
 
-                guiLength = newLength /16
-                resizeButtonLeft.anchoredPosition.x = guiLength
-                if noteSectionRectTransform.sizeDelta.x < guiLength:
-                    noteSectionRectTransform.sizeDelta.x += guiLength
+                addedGuiLength = -length /16
+                transform.localPosition.x -= addedGuiLength
+                noteSectionRectTransform.sizeDelta.x += addedGuiLength
+                resizeButtonRight.anchoredPosition.x += addedGuiLength
+                resizeButtonLeft.anchoredPosition.x = 0
+            //truncate start
             else:
                 //find actual width without empty space
                 x = notes.GetLength(0)-1
@@ -360,6 +370,7 @@ public class NoteSection (MonoBehaviour):
                 else:
                     //TODO: show warning
                     TruncateEnd(length)
+
 
 
         CalculateLoops()
@@ -393,6 +404,7 @@ public class NoteSection (MonoBehaviour):
 
 
     def ZoomOut():
+        musicScore.previousZoom = musicScore.currentZoom
         musicScore.ZoomCanvas(1)
 
     def Select():
@@ -407,13 +419,19 @@ public class NoteSection (MonoBehaviour):
             UpdateInstrument(instrumentChanger.instrumentToChangeTo)
 
         if lastTimeClicked + 0.2f > Time.time:
-            musicScore.ZoomCanvas(3)
+            musicScore.ZoomCanvas(musicScore.previousZoom)
         lastTimeClicked = Time.time
 
-        noteOverlay = Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection
-        noteOverlay.parent = gridParent.parent
-        noteOverlay.anchoredPosition = Vector2.zero
-        noteOverlay.sizeDelta = gridParent.sizeDelta
+        #TODO:
+        # noteOverlay = Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection
+        # if noteOverlay == null:
+        #     print('note overaly nil')
+        # if gridParent ==null or gridParent.parent == null:
+        #     print('grid parent null')
+        # noteOverlay.SetParent(gridParent.parent)
+        # noteOverlay.localScale = Vector2.one
+        # noteOverlay.anchoredPosition = Vector2.zero
+        # noteOverlay.sizeDelta = gridParent.sizeDelta
 
 
     def Deselect():
@@ -478,3 +496,10 @@ public class NoteSection (MonoBehaviour):
     def TransposeOctave(distance as int):
         scaleLength = Amvol.instance.scaleChanger.scaleLength
         Transpose(distance * scaleLength)
+
+
+    def Die():
+        print("DIE!")
+        Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection.parent = Amvol.instance.keyboardPlayer.transform
+        # yield WaitForSeconds(.1f)
+        Destroy(gameObject)

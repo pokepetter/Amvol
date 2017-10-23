@@ -57,4 +57,5 @@ class GridRenderer (MonoBehaviour):
             lineRenderer.enabled = false
             lineRenderer.enabled = true
         except:
-            print("failed to draw grid")
+            # print("failed to draw grid")
+            pass

@@ -121,6 +121,7 @@ class KeyboardPlayer (MonoBehaviour):
             //overlays inside note section
             overlayElement1 = Instantiate(noteOverlay1)
             overlayElement1.transform.SetParent(noteOverlayInsideNoteSection, false)
+            overlayElement1.gameObject.SetActive(false)
             # rectTransform = overlayElement1.AddComponent(RectTransform)
             # rectTransform.anchorMin = Vector2(0f, 0f)
             # rectTransform.anchorMax = Vector2(1f, 0f)

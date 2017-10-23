@@ -59,6 +59,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     public tempoTapper as TempoTapper
 
     public currentZoom as int
+    public previousZoom as int = 3
     private zoomLevels as ((Vector2))
     private noteSizes as (int)
 

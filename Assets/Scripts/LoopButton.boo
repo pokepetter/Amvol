@@ -33,5 +33,5 @@ class LoopButton (MonoBehaviour):
         mouseX = Input.mousePosition.x / Screen.width * 100
 
         if startMouseX > 0:
-            deltaMouseX = Mathf.FloorToInt((mouseX - startMouseX) /4) *4
+            deltaMouseX = Mathf.FloorToInt((mouseX - startMouseX) /1) *1
             noteSectionRectTransform.sizeDelta.x = originalWidth + deltaMouseX
