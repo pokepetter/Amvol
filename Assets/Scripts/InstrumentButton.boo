@@ -32,9 +32,10 @@ public class InstrumentButton (MonoBehaviour):
     public def SetPaths(paths as List of string, startNotesIn as List of int):
         fullPaths = paths
         debugPaths = array(string, fullPaths.Count)
-        debugStartNotes = array(int, fullPaths.Count)
+        debugStartNotes = array(int, startNotesIn.Count)
         for i in range(fullPaths.Count):
             debugPaths[i] = fullPaths[i]
+        for i in range(startNotesIn.Count):
             debugStartNotes[i] = startNotesIn[i]
 
 
@@ -75,17 +76,14 @@ public class InstrumentButton (MonoBehaviour):
         audioClips.Clear()
         startNotes.Clear()
 
-        i as int = 0
-        while i < debugPaths.Length:
+        for i in range(Mathf.Min(debugPaths.Length, debugStartNotes.Length)):
             www  as WWW = WWW("file://" + debugPaths[i])
             audioClip as AudioClip = www.GetAudioClip()
             while not audioClip.isReadyToPlay:
                 yield www
             audioClips.Add(audioClip)
-
-
             startNotes.Add(debugStartNotes[i])
-            i++
+
 
         instrumentToReplace = transform.GetComponentInParent(Instrument)
         Amvol.GetInstrumentChanger().ReplaceInstrument(instrumentToReplace, audioClips, startNotes, attack, falloff, looping, isDrumSet, color)
@@ -96,7 +94,7 @@ public class InstrumentButton (MonoBehaviour):
         iL[0].gameObject.name = instrumentName
         iL[0].transform.GetChild(0).GetComponent(Text).text = instrumentName
         iL[0].transform.GetComponent(Image).color = color
-        iL[0].OpenList()
+        iL[0].Close()
 
         musicScore = Amvol.GetMusicScore()
         for nS in musicScore.noteSections:

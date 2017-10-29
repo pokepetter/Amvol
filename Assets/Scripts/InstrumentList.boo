@@ -23,101 +23,107 @@ class InstrumentList (MonoBehaviour):
     def Select():
         instrumentChanger.SetCurrentInstrument(transform.GetComponent(Instrument))
 
-    public def OpenList():
-        if isOpen:
-            isOpen = false
-            if content.childCount > 0:
-                arr = content.GetComponentsInChildren[of Transform]()
-                for child in arr:
-                    if content.childCount > 0:
-                        DestroyImmediate(content.GetChild(0).gameObject)
-            scrollView.sizeDelta.y = 0
-            scrollView.gameObject.SetActive(false)
 
-        else:
-            isOpen = true
-            scrollView.gameObject.SetActive(true)
-            currentDirectory as string = System.IO.Directory.GetCurrentDirectory()
+    def Close():
+        # clear
+        for child in content.GetComponentsInChildren[of Transform]():
+            if child != content:
+                Destroy(child.gameObject)
 
-            addedPath = "Instruments"
+        scrollView.gameObject.SetActive(false)
+        print('close')
 
-            instrumentDirectory = Path.Combine(currentDirectory, addedPath)
-            ShowFolderContent(addedPath)
 
-    public def ShowFolderContent(instrumentDirectory as string):
-        currentDirectory = System.IO.Directory.GetCurrentDirectory()
-        instrumentDirectory = Path.Combine(currentDirectory, instrumentDirectory)
-        # folders = Directory.GetDirectories(instrumentDirectory)
+    public def ShowFolderContent(relativeDirectory as string):
+        print("relativeDirectory: " + relativeDirectory)
+        instrumentDirectory = Path.Combine(System.IO.Directory.GetCurrentDirectory(), relativeDirectory)
+
+        folders = Directory.GetDirectories(instrumentDirectory)
         files = Directory.GetFileSystemEntries(instrumentDirectory, "*.wav")
-        # content.sizeDelta.y = files.Length
-        # scrollView.sizeDelta.y = files.Length
+        Array.Reverse(folders)
+        Array.Reverse(files)
 
-        # for c in folders:
-        #     clone = Instantiate(folderButton)
-        #     clone.transform.SetParent(content, false)
+        Close()
+        scrollView.gameObject.SetActive(true)
 
-        #     clone.transform.GetComponent(InstrumentButton).SetPath(c)
-        #     folderName as string = c.Remove(0, instrumentDirectory.Length+1)
-        #     words = folderName.Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
-        #     name = words[0]
-        #     clone.transform.GetChild(0).GetComponent(Text).text = folderName
-        #     clone.transform.GetComponent(InstrumentButton).SetName(folderName)
-
-        i as int = 0
         paths = List of string()
         startNotes = List of int()
         buttonPosition = 0
-        while i < files.Length:
+        foundIntruments = List of string()
+        print('yo')
+        for file in files:
+            # print(Path.GetFileName(file))
+            words = Path.GetFileName(file).Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
+
+            if foundIntruments.Contains(words[0]):
+                continue
+            foundIntruments.Add(words[0])
+
             clone = Instantiate(instrumentButton)
             clone.transform.SetParent(content, false)
             clone.transform.localPosition.y = buttonPosition
-            scrollView.sizeDelta.y = buttonPosition+1
-            # content.sizeDelta.y = scrollView.sizeDelta.y+1
-            buttonPosition++
+            clone.name = words[0]
+            clone.transform.GetChild(0).GetComponent(Text).text = words[0]
 
             paths.Clear()
             startNotes.Clear()
-            paths.Add(files[i])
+            paths.Add(file)
 
-            fullName as string = files[i].Remove(0, instrumentDirectory.Length+1)
-            # print(fullName)
-            words = fullName.Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
-            for e in words:
-                if e[0] == Char.Parse("n"):
-                    startNoteString as string = e.Remove(0,1)
-                    startNotes.Add(int.Parse(startNoteString))
-            name = words[0]
-            clone.name = name
-            clone.transform.GetChild(0).GetComponent(Text).text = name
+            for word in words:
+                if word.StartsWith("n"):
+                    startNotes.Add(int.Parse(word.Remove(0,1)))
 
-            j as int = 1
-            while j < 16:
-                if i+j < files.Length:
-                    nextFullName as string = files[i+j].Remove(0, instrumentDirectory.Length+1)
-                    nextWords = nextFullName.Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
-                    nextName = nextWords[0]
-                    if nextName == name:
-                        paths.Add(files[i+j])
-                        for e in nextWords:
-                            if e[0] == Char.Parse("n"):
-                                nextStartNoteString as string = e.Remove(0,1)
-                                startNotes.Add(int.Parse(nextStartNoteString))
-                        i++
-                        j = 0
-                j++
-            clone.transform.GetComponent(InstrumentButton).SetPaths(paths, startNotes)
+
+            for otherFile in files:
+                if otherFile == file:
+                    continue
+
+                otherFileWords = Path.GetFileName(otherFile).Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
+                if otherFileWords[0] == words[0]:   // found match
+                    paths.Add(otherFile)
+
+                    for otherWord in otherFileWords:
+                        if otherWord.StartsWith("n"):
+                            startNotes.Add(int.Parse(otherWord.Remove(0,1)))
+
+            for i in range(Mathf.Max(0, startNotes.Count - paths.Count)):
+                startNotes.Add(0)
+
+            try:
+                clone.transform.GetComponent(InstrumentButton).SetPaths(paths, startNotes)
+            except:
+                Destroy(clone)
+                print("invalid insturment")
+
+
+        for folder in folders:
+            cloneF = Instantiate(folderButton)
+            cloneF.transform.SetParent(content, false)
+            cloneF.transform.GetComponent(InstrumentFolderButton).path = Path.Combine(relativeDirectory, Path.GetFileName(folder))
+            cloneF.transform.GetChild(0).GetComponent(Text).text = Path.GetFileName(folder)
+            cloneF.name = Path.GetFileName(folder)
+            # cloneF.transform.GetComponent(InstrumentFolderButton).SetName(folderName)
+
+        if relativeDirectory != "Instruments":
+            backButton = Instantiate(folderButton)
+            backButton.transform.SetParent(content, false)
+            backButton.transform.GetComponent(InstrumentFolderButton).path = Directory.GetParent(relativeDirectory).ToString()
+            backButton.name = "<<<<<"
+            backButton.transform.GetChild(0).GetComponent(Text).text = "<<<<<"
+
+
+        content.sizeDelta.y = foundIntruments.Count + folders.Length + 1
+        scrollView.sizeDelta.y = foundIntruments.Count + folders.Length + 1
+
             //for debug
-            x as int = 0
-            debugPaths = array(string, paths.Count)
-            while x < paths.Count:
-                debugPaths[x] = paths[x]
-                x++
+            # x as int = 0
+            # debugPaths = array(string, paths.Count)
+            # while x < paths.Count:
+            #     debugPaths[x] = paths[x]
+            #     x++
 
-            x = 0
-            debugStartNotes = array(int, startNotes.Count)
-            while x < startNotes.Count:
-                debugStartNotes[x] = startNotes[x]
-                x++
-
-
-            i++
+            # x = 0
+            # debugStartNotes = array(int, startNotes.Count)
+            # while x < startNotes.Count:
+            #     debugStartNotes[x] = startNotes[x]
+            #     x++

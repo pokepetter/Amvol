@@ -168,7 +168,7 @@ public class SaveSystem (MonoBehaviour):
             for i in range(instrumentStringParts.Length):
                 instrument = instrumentChanger.AddInstrument()
                 instrumentList = instrument.transform.GetComponent(InstrumentList)
-                instrumentList.OpenList()
+                instrumentList.ShowFolderContent("Instruments")
 
                 for j in range(instrumentList.content.transform.childCount):
                     if instrumentStringParts[i] == instrumentList.content.transform.GetChild(j).gameObject.name:

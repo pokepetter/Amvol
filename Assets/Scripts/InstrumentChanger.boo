@@ -41,8 +41,8 @@ class InstrumentChanger (MonoBehaviour):
     def AddInstrumentFromButton():
         instrument = AddInstrument()
         instrumentList = instrument.transform.GetComponent(InstrumentList)
-        instrumentList.OpenList()
-        instrumentList.content.transform.GetChild(0).GetComponent(InstrumentButton).SelectFile()
+        instrumentList.ShowFolderContent("Instruments")
+        instrumentList.content.GetComponentsInChildren[of InstrumentButton]()[0].SelectFile()
 
     def AddInstrument() as Instrument:
         newInstrument as Instrument = Instantiate(instrumentPrefab).GetComponent(Instrument)
