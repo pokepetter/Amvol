@@ -1,1 +1,1 @@
-project_folder: C:\Users\Petter\Documents\Amvol
+project_folder: default
