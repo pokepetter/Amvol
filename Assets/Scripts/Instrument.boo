@@ -10,6 +10,7 @@ class Instrument (MonoBehaviour):
     public falloff as single = 6
     public attackSoftening as single = 1
     public isDrumSet as bool
+    public muted as bool = false
     public instrumentColor as Color
 
     public audioClips as (AudioClip)
@@ -69,6 +70,9 @@ class Instrument (MonoBehaviour):
             # print(notes[i] +" / "+ newAudioClips[i].ToString())
 
     def PlayNote(y as int, z as single) as Note:
+        if muted:
+            return null
+
         clone = GameObject(y.ToString())
         clone.transform.SetParent(noteParent, false)
         aS = clone.AddComponent(AudioSource)
@@ -161,6 +165,9 @@ class Instrument (MonoBehaviour):
     def SetLerpSpeed(newAttack as single, newFalloff as single):
         attack = newAttack
         falloff = newFalloff
+
+    def Mute(newMuted as bool):
+        muted = newMuted
 
     def ToggleviewAutomation():
         if viewAutomation:

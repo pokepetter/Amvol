@@ -244,11 +244,12 @@ public class NoteSection (MonoBehaviour):
         if not instrument.isDrumSet:
             y = scaleChanger.NoteOffset(y, false)
         note = instrument.PlayNote(y, z)
-        connectedNotes.Add(note)
+        if note != null:
+            connectedNotes.Add(note)
 
-        if not isRecording:
-            for n in connectedNotes:
-                n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/16].y / noteSectionRectTransform.rect.height
+            if not isRecording:
+                for n in connectedNotes:
+                    n.audioLerper.noteSectionMultiplier = automation.lineRenderer.points[x/16].y / noteSectionRectTransform.rect.height
 
 
     def StopPlayingNote(y as int):
