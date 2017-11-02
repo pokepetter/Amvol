@@ -47,10 +47,21 @@ public class FileBrowser (MonoBehaviour):
                 words as (string) = line.Split(char.Parse(" "))
                 for i in range(words.Length):
                     if words[i] == "project_folder:":
-                        if System.IO.Directory.Exists(words[i+1]):
-                            defaultDirectory = words[i+1]
+                        if words[i+1] == "default":
+                            defaultDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)
+                            defaultDirectory = Path.Combine(defaultDirectory, "Amvol")
                         else:
-                            defaultDirectory = System.IO.Directory.GetCurrentDirectory()
+                            defaultDirectory = words[i+1]
+                        
+                        if not System.IO.Directory.Exists(defaultDirectory):
+                            try:
+                                System.IO.Directory.CreateDirectory(defaultDirectory)
+                                print("created project directory at: " + defaultDirectory)
+                            except:
+                                print("couldn't create project folder at: " + defaultDirectory)
+                                defaultDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)
+                                defaultDirectory = Path.Combine(defaultDirectory, "Amvol")
+                                
             file.Close()
         except:
             defaultDirectory = System.IO.Directory.GetCurrentDirectory()
