@@ -34,4 +34,7 @@ class Note (MonoBehaviour):
 
     def FixedUpdate(): 
         if instrument != null and audioLerper != null:
-            audioSource.pitch = Mathf.Lerp(audioSource.pitch, targetPitch, Time.fixedDeltaTime * instrument.legatoSpeed)
+            if instrument.legatoSpeed < 49:
+                audioSource.pitch = Mathf.Lerp(audioSource.pitch, targetPitch, Time.fixedDeltaTime * instrument.legatoSpeed)
+            else:
+                audioSource.pitch = targetPitch

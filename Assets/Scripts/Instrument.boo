@@ -176,3 +176,16 @@ class Instrument (MonoBehaviour):
         else:
             viewAutomation = true
             layoutElement.preferredHeight = originalGUIHeight + 1f
+
+    def Destroy():
+        instrumentChanger = Amvol.instance.instrumentChanger
+        instrumentChanger.instruments.Remove(self)
+        if instrumentChanger.instruments.Count > 0:
+            instrumentChanger.currentInstrument = instrumentChanger.instruments[0]
+        else:
+            instrumentChanger.currentInstrument = null
+
+        if instrumentChanger.instrumentIndex > 0:
+            instrumentChanger.instrumentIndex--
+
+        Destroy(gameObject)

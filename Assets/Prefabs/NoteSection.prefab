@@ -615,8 +615,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11467458}
   m_HandleRect: {fileID: 22477934}
   m_Direction: 2
-  m_Value: 0.00000011920936
-  m_Size: 0.5000003
+  m_Value: 0
+  m_Size: 0.5000002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1221,8 +1221,8 @@ RectTransform:
   m_LocalScale: {x: 0.0625, y: 0.0625, z: 1}
   m_Children:
   - {fileID: 22423650}
-  - {fileID: 22457560}
   - {fileID: 224249186601028704}
+  - {fileID: 22457560}
   m_Father: {fileID: 22433978}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1401,7 +1401,7 @@ RectTransform:
   - {fileID: 224593320500248052}
   - {fileID: 224696035636865878}
   m_Father: {fileID: 22406450}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2599,13 +2599,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11495680}
-        m_MethodName: ZoomIn
-        m_Mode: 1
+      - m_Target: {fileID: 0}
+        m_MethodName: ZoomCanvas
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
@@ -3982,7 +3982,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 22406450}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
