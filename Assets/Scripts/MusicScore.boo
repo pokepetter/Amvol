@@ -94,7 +94,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
         if noteSections.Count > 0 or instrumentChanger.instruments.Count > 0:
             print("warning")
         for nS in noteSections:
-            Destroy(nS.gameObject)
+            nS.Die()
         noteSections.Clear()
 
         for i in instrumentChanger.instruments:
@@ -313,7 +313,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
             currentNoteSection.isRecording = false
             if currentNoteSection.NumberOfNotes() == 0:
                 noteSections.Remove(currentNoteSection)
-                Destroy(currentNoteSection.gameObject)
+                currentNoteSection.Die()
                 currentNoteSection = null
 
         for noteSection in noteSections:
@@ -401,7 +401,7 @@ public class MusicScore (MonoBehaviour, IPointerDownHandler, IScrollHandler):
     def DeleteSelectedNoteSections():
         if currentNoteSection != null:
             noteSections.Remove(currentNoteSection)
-            Destroy(currentNoteSection.gameObject)
+            currentNoteSection.Die()
 
     def FindAvailableSpace(noteSection as NoteSection, x as int, y as int, width as int) as Vector2:
         # x *= canvasButton.localScale.x

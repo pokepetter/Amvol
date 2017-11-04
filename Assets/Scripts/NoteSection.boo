@@ -289,6 +289,8 @@ public class NoteSection (MonoBehaviour):
 
         automation.lineRenderer.points = newAutomationPoints
 
+        resizeButtonRight.anchoredPosition.x = sectionLength / 16
+
 
     def AddLength(length as int, direction as Vector2):
         print("add: " + length + ", direction: " + direction)
@@ -313,6 +315,7 @@ public class NoteSection (MonoBehaviour):
                 notes = newNotes
 
                 loopButtonRight.anchoredPosition.x = 0
+
 
                 for grid in grids:
                     grid.DrawGrid()
@@ -424,15 +427,15 @@ public class NoteSection (MonoBehaviour):
         lastTimeClicked = Time.time
 
         #TODO:
-        # noteOverlay = Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection
-        # if noteOverlay == null:
-        #     print('note overaly nil')
-        # if gridParent ==null or gridParent.parent == null:
-        #     print('grid parent null')
-        # noteOverlay.SetParent(gridParent.parent)
-        # noteOverlay.localScale = Vector2.one
-        # noteOverlay.anchoredPosition = Vector2.zero
-        # noteOverlay.sizeDelta = gridParent.sizeDelta
+        noteOverlay = Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection
+        if noteOverlay == null:
+            print('note overaly nil')
+        if gridParent ==null or gridParent.parent == null:
+            print('grid parent null')
+        noteOverlay.SetParent(gridParent.parent)
+        noteOverlay.localScale = Vector2.one
+        noteOverlay.anchoredPosition = Vector2.zero
+        noteOverlay.sizeDelta = gridParent.sizeDelta
 
 
     def Deselect():
@@ -500,7 +503,5 @@ public class NoteSection (MonoBehaviour):
 
 
     def Die():
-        print("DIE!")
-        Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection.parent = Amvol.instance.keyboardPlayer.transform
-        # yield WaitForSeconds(.1f)
+        Amvol.instance.keyboardPlayer.noteOverlayInsideNoteSection.parent = null
         Destroy(gameObject)

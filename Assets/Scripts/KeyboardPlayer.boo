@@ -57,12 +57,14 @@ class KeyboardPlayer (MonoBehaviour):
                 if Input.GetKeyDown(keys[i]):
                     instrumentChanger.PlayNote(i + (octaveOffset * octaveLength), Random.Range(0.8f, 0.9f))
                     overlays[i + (octaveOffset * octaveLength)].SetActive(true)
+                    overlays1[i + (octaveOffset * octaveLength)].SetActive(true)
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StartNote(i + (octaveOffset * octaveLength), 1f)
 
                 if Input.GetKeyUp(keys[i]):
                     instrumentChanger.StopPlayingNote(i + (octaveOffset * octaveLength))
                     overlays[i + (octaveOffset * octaveLength)].SetActive(false)
+                    overlays1[i + (octaveOffset * octaveLength)].SetActive(false)
                     if musicScore.recording and musicScore.playing:
                         musicScore.currentNoteSection.StopNote(i + (octaveOffset * octaveLength))
                 i++

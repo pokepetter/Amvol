@@ -42,13 +42,14 @@ class InstrumentChanger (MonoBehaviour):
         instrument = AddInstrument()
         instrumentList = instrument.transform.GetComponent(InstrumentList)
         instrumentList.ShowFolderContent("Instruments")
-        instrumentList.content.GetComponentsInChildren[of InstrumentButton]()[0].SelectFile()
+        //temp, do an actual search, needed for loading as well.
+        allInstruments = instrumentList.content.GetComponentsInChildren[of InstrumentButton]()
+        allInstruments[allInstruments.Length-1].SelectFile()
 
     def AddInstrument() as Instrument:
         newInstrument as Instrument = Instantiate(instrumentPrefab).GetComponent(Instrument)
-        newInstrument.transform.SetParent(instrumentsParent, false) 
-        # addInstrumentButton.SetParent(null, false)
-        # addInstrumentButton.SetParent(instrumentsParent, false)
+        newInstrument.transform.SetParent(instrumentsParent, false)
+        newInstrument.transform.SetSiblingIndex(1)
         instruments.Add(newInstrument)
         SetCurrentInstrument(newInstrument)
         return newInstrument

@@ -31,7 +31,6 @@ class InstrumentList (MonoBehaviour):
                 Destroy(child.gameObject)
 
         scrollView.gameObject.SetActive(false)
-        print('close')
 
 
     public def ShowFolderContent(relativeDirectory as string):
@@ -50,7 +49,7 @@ class InstrumentList (MonoBehaviour):
         startNotes = List of int()
         buttonPosition = 0
         foundIntruments = List of string()
-        print('yo')
+
         for file in files:
             # print(Path.GetFileName(file))
             words = Path.GetFileName(file).Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))

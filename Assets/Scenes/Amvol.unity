@@ -4949,8 +4949,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.06249909, y: 0.06249909, z: 1}
-  m_Children:
-  - {fileID: 329229331}
+  m_Children: []
   m_Father: {fileID: 1733802366}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5030,74 +5029,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 328342103}
---- !u!1 &329229330
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 329229331}
-  - component: {fileID: 329229333}
-  - component: {fileID: 329229332}
-  m_Layer: 5
-  m_Name: NoteOverlay1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &329229331
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 329229330}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 327424537}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &329229332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 329229330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.2509804}
-  m_RaycastTarget: 0
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
---- !u!222 &329229333
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 329229330}
 --- !u!1 &335533698
 GameObject:
   m_ObjectHideFlags: 0
@@ -6852,7 +6783,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22457672, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -2.7047043
+      value: -2.7649193
       objectReference: {fileID: 0}
     - target: {fileID: 22409174, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchorMax.x
@@ -6939,7 +6870,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22457672, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0000038146973
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11448212, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
@@ -9986,8 +9917,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 522217401}
   m_HandleRect: {fileID: 522217400}
   m_Direction: 2
-  m_Value: 0.000000097447995
-  m_Size: 0.3883441
+  m_Value: 0
+  m_Size: 0.3888176
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11277,8 +11208,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1862917152}
   m_HandleRect: {fileID: 1862917151}
   m_Direction: 0
-  m_Value: 0.00019121179
-  m_Size: 0.8400001
+  m_Value: 0.00018382055
+  m_Size: 0.83999985
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16247,7 +16178,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0015258789, y: 0.0000076293945}
+  m_AnchoredPosition: {x: -0.0014648438, y: 0.0000038146973}
   m_SizeDelta: {x: 50, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1163611869
@@ -16373,11 +16304,6 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114455690175258314, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c,
-        type: 2}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 837482767}
     - target: {fileID: 11495680, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c, type: 2}
       propertyPath: instrumentChanger
       value: 
@@ -16386,13 +16312,22 @@ Prefab:
       propertyPath: musicScore
       value: 
       objectReference: {fileID: 837482767}
+    - target: {fileID: 114455690175258314, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 837482767}
+    - target: {fileID: 22477934, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c, type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.00000014901158
+      objectReference: {fileID: 0}
     - target: {fileID: 22477934, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c, type: 2}
       propertyPath: m_AnchorMax.x
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 22477934, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 0.5000002
+      value: 0.50000024
       objectReference: {fileID: 0}
     - target: {fileID: 116188, guid: 9c1c92fd86ffb4a4ea54ef5343b6d68c, type: 2}
       propertyPath: m_IsActive
@@ -16704,7 +16639,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22457672, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -6.6723976
+      value: -0.0000038146973
       objectReference: {fileID: 0}
     - target: {fileID: 174564, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_IsActive
@@ -21972,8 +21907,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1462062008}
   m_HandleRect: {fileID: 1462062007}
   m_Direction: 0
-  m_Value: 0.00000055631
-  m_Size: 0.625
+  m_Value: 0.00000055630994
+  m_Size: 0.62499994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -25943,7 +25878,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -2.5235577, y: 2.5235586}
+  m_AnchoredPosition: {x: -0.06885523, y: 0.06885111}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1715307149
@@ -26253,7 +26188,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pianoRoll: {fileID: 1733802366}
   noteOverlay: {fileID: 178324, guid: bcb86c9a3932ed54693bfd5dfcee0a83, type: 2}
-  noteOverlay1: {fileID: 329229330}
+  noteOverlay1: {fileID: 1936763025628804, guid: f2ff315fb89760342b0f7c45f5e68f25,
+    type: 2}
   noteOverlayInsideNoteSection: {fileID: 327424537}
   usingMidiKeyboard: 1
   blockInput: 0
@@ -28758,7 +28694,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 951943804}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.873367
+  m_Size: 0.9110338
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -30065,7 +30001,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3996995}
   m_Direction: 0
   m_Value: 1
-  m_Size: 0.87771106
+  m_Size: 0.91408604
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
