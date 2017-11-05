@@ -43,7 +43,7 @@ public class WavWriter (MonoBehaviour):
         for noteSection in musicScore.noteSections:
             if noteSection.transform.localPosition.x + noteSection.transform.GetComponent(RectTransform).sizeDelta.x > endPoint:
                 endPoint = noteSection.transform.localPosition.x + noteSection.transform.GetComponent(RectTransform).sizeDelta.x
-        width = endPoint * 8
+        width = endPoint * 16
         print('width: ' + width)
 
         if width > 0:

@@ -240,7 +240,8 @@ public class SaveSystem (MonoBehaviour):
                         //set notes
                         for x in range(noteSectionLength):
                             for y in range(128):
-                                noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)
+                                if tex.GetPixel(w+x, h+y).r > 0:
+                                    noteSection.SetNote(x, y, tex.GetPixel(w+x, h+y).r)
 
                         //volume automation
                         # yield null
@@ -251,7 +252,7 @@ public class SaveSystem (MonoBehaviour):
                             for y in range(h+1, h+1+127):
                                 lineHeight = tex.GetPixel(x,y)
                                 if lineHeight.g > 0f:
-                                    print("x: " + x/16 + " => " + y)
+                                    # print("x: " + x/16 + " => " + y)
                                     try:
                                         noteSection.automation.lineRenderer.points[x/16].y = (y-h) / 127f * noteSection.noteSectionRectTransform.rect.height
                                     except:
