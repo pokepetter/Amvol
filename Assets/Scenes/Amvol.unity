@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -77,17 +77,19 @@ LightmapSettings:
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -107,6 +109,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &3996994
 GameObject:
@@ -2093,6 +2097,7 @@ GameObject:
   m_Component:
   - component: {fileID: 138289662}
   - component: {fileID: 138289661}
+  - component: {fileID: 138289663}
   m_Layer: 0
   m_Name: Amvol
   m_TagString: Untagged
@@ -2130,6 +2135,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &138289663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 138289660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f885e44979814045bde8c2388001d71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &141217293
 GameObject:
   m_ObjectHideFlags: 0
@@ -2366,6 +2382,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &150502946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3075,6 +3092,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &179921315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3460,11 +3478,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!4 &199975996
 Transform:
   m_ObjectHideFlags: 0
@@ -4228,6 +4246,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &280596305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4907,6 +4926,7 @@ MonoBehaviour:
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &320599076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4998,7 +5018,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000011924562, y: -0.000007748604}
+  m_AnchoredPosition: {x: -0.000005692173, y: 0.0000013113022}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &328342105
@@ -6783,7 +6803,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22457672, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -2.7649193
+      value: 205.23508
       objectReference: {fileID: 0}
     - target: {fileID: 22409174, guid: 8782768da64b7a04ea3b4d9c3927de58, type: 2}
       propertyPath: m_AnchorMax.x
@@ -8539,6 +8559,7 @@ MonoBehaviour:
   m_PreferredHeight: 2
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &616697918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9918,7 +9939,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 522217400}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.3888176
+  m_Size: 0.38856506
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10397,7 +10418,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000018793664, y: -0.0000023692846}
+  m_AnchoredPosition: {x: 0.00000085902764, y: -0.000000017054804}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &770251326
@@ -11208,8 +11229,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1862917152}
   m_HandleRect: {fileID: 1862917151}
   m_Direction: 0
-  m_Value: 0.00018382055
-  m_Size: 0.83999985
+  m_Value: 0.00018310547
+  m_Size: 0.84
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13771,6 +13792,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &967510711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15419,6 +15441,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1062595932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16058,6 +16081,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1125735466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18584,6 +18608,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1326609580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19684,6 +19709,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1361869218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20549,6 +20575,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1409641862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21638,6 +21665,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1472263964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21928,8 +21956,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1462062008}
   m_HandleRect: {fileID: 1462062007}
   m_Direction: 0
-  m_Value: 0.00000055630994
-  m_Size: 0.62499994
+  m_Value: 0.0000003973643
+  m_Size: 0.625
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24538,6 +24566,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1637533341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25012,6 +25041,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1653024503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25899,7 +25929,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0000076293945, y: 0.0000038146973}
+  m_AnchoredPosition: {x: -0.000005364418, y: 0.0000025279796}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1715307149
@@ -26326,7 +26356,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2052412108}
   m_HandleRect: {fileID: 2052412106}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -26792,6 +26822,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1772971665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32339,6 +32370,7 @@ MonoBehaviour:
   m_PreferredHeight: 1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &2139745396
 MonoBehaviour:
   m_ObjectHideFlags: 0

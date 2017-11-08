@@ -1,4 +1,5 @@
 ﻿import UnityEngine
+import UnityEngine.UI
 
 class PaintBucket (MonoBehaviour): 
     

@@ -1,4 +1,5 @@
 ﻿import UnityEngine
+# import System.Windows.Forms
 
 public class Amvol (MonoBehaviour): 
     
@@ -13,7 +14,11 @@ public class Amvol (MonoBehaviour):
 
     def Awake():
         instance = self
-        Screen.SetResolution(Screen.currentResolution.width-100, Screen.currentResolution.height-100, false)
+
+        ifdef UNITY_STANDALONE_WIN:
+            taskBarHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
+            UnityEngine.Screen.SetResolution(UnityEngine.Screen.currentResolution.width, UnityEngine.Screen.currentResolution.height - taskBarHeight, false)
+            
 
     public static def GetMusicScore() as MusicScore:
         return instance.musicScore
