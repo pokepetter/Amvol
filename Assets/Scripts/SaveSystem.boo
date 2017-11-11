@@ -426,7 +426,6 @@ public class SaveSystem (MonoBehaviour):
             returnValue += last_byte
         return returnValue
 
-    def Update():
-        if Input.GetKeyDown(KeyCode.P):
-
-            LoadMidi("E:\\UnityProjects\\Amvol\\Midi\\midiFileTest2.mid")
+    # def Update():
+    #     if Input.GetKeyDown(KeyCode.P):
+    #         LoadMidi("E:\\UnityProjects\\Amvol\\Midi\\midiFileTest2.mid")

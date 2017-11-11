@@ -64,13 +64,15 @@ class InstrumentChanger (MonoBehaviour):
 
         currentInstrument = instrument
 
-    def ReplaceInstrument(audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, isDrumSet as bool, color as Color):
-        ReplaceInstrument(currentInstrument, audioClips, startNotes, attack, falloff, loop, isDrumSet, color)
+    def ReplaceInstrument(audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, legato as single, loop as bool, isDrumSet as bool, color as Color):
+        ReplaceInstrument(currentInstrument, audioClips, startNotes, attack, falloff, legato, loop, isDrumSet, color)
 
-    def ReplaceInstrument(targetInstrument as Instrument, audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, loop as bool, isDrumSet as bool, color as Color):
+    def ReplaceInstrument(targetInstrument as Instrument, audioClips as List of AudioClip, startNotes as List of int, attack as single, falloff as single, legato as single, loop as bool, isDrumSet as bool, color as Color):
         targetInstrument.transform.GetComponent(AudioSource).clip = audioClips[0]
         targetInstrument.transform.GetComponent(AudioSource).loop = loop
-        targetInstrument.SetLerpSpeed(attack, falloff)
+        targetInstrument.LoadAttack(attack)
+        targetInstrument.LoadFalloff(falloff)
+        targetInstrument.LoadLegatoSpeed(legato)
         targetInstrument.isDrumSet = isDrumSet
         targetInstrument.instrumentColor = color
         targetInstrument.SetAudioClips(array(AudioClip, audioClips), array(int, startNotes))  

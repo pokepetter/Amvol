@@ -61,7 +61,7 @@ public class FileBrowser (MonoBehaviour):
                                 print("couldn't create project folder at: " + defaultDirectory)
                                 defaultDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)
                                 defaultDirectory = Path.Combine(defaultDirectory, "Amvol")
-                                
+                                    
             file.Close()
         except:
             defaultDirectory = System.IO.Directory.GetCurrentDirectory()
@@ -152,7 +152,7 @@ public class FileBrowser (MonoBehaviour):
             startNotes as List of int
             startNotes.Add(60)
 
-            Amvol.GetInstrumentChanger().ReplaceInstrument(audioClips, startNotes, 0.05f, 0.5f, false, false, Color.grey)
+            Amvol.GetInstrumentChanger().ReplaceInstrument(audioClips, startNotes, 0.05f, 0.5f, 50, false, false, Color.grey)
         if currentDirectory.Substring(currentDirectory.Length-4) == ".png":
             Amvol.GetSaveSystem().Load(currentDirectory)
         if currentDirectory.Substring(currentDirectory.Length-4) == ".mid":

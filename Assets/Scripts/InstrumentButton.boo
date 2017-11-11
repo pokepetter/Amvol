@@ -12,6 +12,7 @@ public class InstrumentButton (MonoBehaviour):
     public debugStartNotes as (int)
     public attack as single = 0.0f
     public falloff as single = 0.5f
+    public legato as int = 50
     public looping as bool
     public isDrumSet as bool
     public color as Color
@@ -41,16 +42,17 @@ public class InstrumentButton (MonoBehaviour):
 
         words = paths[0].Split(Char.Parse("-"), Char.Parse("."), Char.Parse("_"))
         for e in words:
-            if e[0] == Char.Parse("a"): //attack
-                attackString as string = e.Remove(0,1)
-                attack = int.Parse(attackString) / 100f
+            if e.StartsWith("a"): //attack
+                attack = int.Parse(e.Remove(0,1)) / 100f
 
-            if e[0] == Char.Parse("f"): //falloff
-                falloffString as string = e.Remove(0,1)
-                falloff = int.Parse(falloffString) / 100f
+            if e.StartsWith("f"): //falloff
+                falloff = int.Parse(e.Remove(0,1)) / 100f
 
             if e == "loop":
                 looping = true
+
+            if e.StartsWith("l") and e != "loop":
+                legato = int.Parse(e.Remove(0,1))
 
             if e == "drumset":
                 isDrumSet = true
@@ -86,7 +88,7 @@ public class InstrumentButton (MonoBehaviour):
 
 
         instrumentToReplace = transform.GetComponentInParent(Instrument)
-        Amvol.GetInstrumentChanger().ReplaceInstrument(instrumentToReplace, audioClips, startNotes, attack, falloff, looping, isDrumSet, color)
+        Amvol.GetInstrumentChanger().ReplaceInstrument(instrumentToReplace, audioClips, startNotes, attack, falloff, legato, looping, isDrumSet, color)
 
         iL = transform.GetComponentsInParent[of InstrumentList]()
         instrumentName as string = words[0].Remove(0, iL[0].instrumentDirectory.Length+1)

@@ -1,5 +1,7 @@
 import UnityEngine
 import System.Collections
+import UnityEngine.UI
+
 
 class Instrument (MonoBehaviour): 
 
@@ -14,6 +16,10 @@ class Instrument (MonoBehaviour):
     public instrumentColor as Color
 
     public audioClips as (AudioClip)
+
+    public attackSlider as CustomSlider
+    public falloffSlider as CustomSlider
+    public legatoSlider as CustomSlider
 
     public lastPitch as single = 1
     private maxNotes as int = 8 * 12
@@ -110,7 +116,8 @@ class Instrument (MonoBehaviour):
         aS.spread = targetAudioSource.spread
         aS.volume = 0f
         aS.panStereo = pan
-        if aS.loop:
+        # if aS.loop:
+        if legatoSpeed < 50:
             aS.pitch = lastPitch
         else:
             aS.pitch = Mathf.Pow(1/notePitchDelta, distance)
@@ -150,21 +157,29 @@ class Instrument (MonoBehaviour):
     def SetPan(newPan as single):
         pan = newPan
 
-    def SetLegatoSpeed(newLegatoSpeed as single):
-        legatoSpeed = newLegatoSpeed
+    def LoadAttack(newAttack as single):
+        attack = newAttack
+        attackSlider.SetValue(newAttack, false)
 
     def SetAttack(newAttack as single):
         attack = newAttack
 
+    def LoadFalloff(newFalloff as single):
+        falloff = newFalloff
+        falloffSlider.SetValue(newFalloff, false)
+
     def SetFalloff(newFalloff as single):
         falloff = newFalloff
 
+    def LoadLegatoSpeed(newLegatoSpeed as single):
+        legatoSpeed = newLegatoSpeed
+        legatoSlider.SetValue(newLegatoSpeed, false)
+
+    def SetLegatoSpeed(newLegatoSpeed as single):
+        legatoSpeed = newLegatoSpeed
+
     def SetLastPitch(pitch as single):
         lastPitch = pitch
-
-    def SetLerpSpeed(newAttack as single, newFalloff as single):
-        attack = newAttack
-        falloff = newFalloff
 
     def Mute(newMuted as bool):
         muted = newMuted
